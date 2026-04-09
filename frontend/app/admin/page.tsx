@@ -31,6 +31,7 @@ export default function AdminPage() {
         localStorage.setItem('adminToken', data.token);
         setLoggedIn(true);
         setError("");
+        window.dispatchEvent(new Event("storage")); // Manually trigger storage event for the current tab
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.detail || "Invalid credentials");

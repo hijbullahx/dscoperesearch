@@ -2,12 +2,39 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      if (typeof window !== 'undefined' && localStorage.getItem('adminToken')) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuth(); // Initial check
+
+    window.addEventListener('storage', checkAuth); // Listen for storage changes
+
+    return () => {
+      window.removeEventListener('storage', checkAuth); // Cleanup
+    };
+  }, []);
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('adminToken');
+    }
+    setIsLoggedIn(false);
+    router.push('/');
+  };
 
   return (
     <nav className="w-full border-b border-gray-200 bg-white/60 backdrop-blur-xl sticky top-0 z-50">
@@ -41,12 +68,21 @@ export default function Navbar() {
           >
             Team
           </Link>
-          <button
-            className="px-4 py-2 rounded bg-gray-900 text-white hover:bg-gray-800 transition font-medium"
-            onClick={() => setSidebarOpen(true)}
-          >
-            Login
-          </button>
+          {isLoggedIn ? (
+            <button
+              className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-500 transition font-medium"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              className="px-4 py-2 rounded bg-gray-900 text-white hover:bg-gray-800 transition font-medium"
+              onClick={() => setSidebarOpen(true)}
+            >
+              Login
+            </button>
+          )}
         </div>
       </div>
       {/* Sidebar overlay and menu */}
