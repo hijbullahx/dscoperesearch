@@ -1,11 +1,12 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -75,7 +76,16 @@ export default function Navbar() {
                 <a href="#" className="block px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm font-normal whitespace-normal break-words">Login as Registered Member</a>
                 <a href="#" className="block px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm font-normal whitespace-normal break-words">Login as Instructor</a>
                 <a href="#" className="block px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm font-normal whitespace-normal break-words">Login as Core Member</a>
-                <a href="#" className="block px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm font-normal whitespace-normal break-words">Login as Admin</a>
+                <button
+                  type="button"
+                  className="block text-left w-full px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm font-normal whitespace-normal break-words"
+                  onClick={() => {
+                    setSidebarOpen(false);
+                    router.push('/admin');
+                  }}
+                >
+                  Login as Admin
+                </button>
               </div>
               <hr className="my-3 border-gray-200" />
               <div className="mt-3 text-gray-600 text-center text-sm">

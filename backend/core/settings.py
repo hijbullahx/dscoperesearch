@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     'projects',
     'rest_framework',
     'corsheaders',
+    'rest_framework.authtoken',
 ]
+# Application definition
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
