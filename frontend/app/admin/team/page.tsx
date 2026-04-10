@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaPlus, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 
 type TeamMember = {
   id: number;
@@ -16,18 +16,9 @@ type TeamMember = {
   website?: string;
 };
 
-type PendingRegistration = {
-  id: number;
-  name: string;
-  email: string;
-  requested_role: string;
-  bio?: string;
-};
-
 const TeamAdminPage = () => {
   const router = useRouter();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [pendingRegistrations, setPendingRegistrations] = useState<PendingRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -46,21 +37,12 @@ const TeamAdminPage = () => {
       .catch(() => setLoading(false));
   };
 
-  const fetchPendingRegistrations = () => {
-    // This is mocked for now. Replace with your actual API call.
-    setPendingRegistrations([
-      { id: 1, name: 'Alice Pending', email: 'alice@example.com', requested_role: 'General Member', bio: 'Interested in research.' },
-      { id: 2, name: 'Bob Pending', email: 'bob@example.com', requested_role: 'Instructor', bio: '' },
-    ]);
-  };
-
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
       router.replace('/admin');
       return;
     }
     fetchTeamMembers();
-    fetchPendingRegistrations();
   }, [router]);
 
   const handleAddMember = async (e: React.FormEvent) => {
@@ -170,80 +152,6 @@ const TeamAdminPage = () => {
     }
   };
 
-  const handleApprove = async (registration: PendingRegistration) => {
-    // STEP 1: Send a request to your backend to create a new user/member
-    // and delete the pending registration. This is a placeholder.
-    console.log('Approving registration:', registration);
-    
-    // --- REPLACE THIS with your actual backend API call ---
-    // Example:
-    /*
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/registrations/approve/${registration.id}/`, {
-        method: 'POST',
-        headers: { 'Authorization': `Token ${token}` },
-      });
-
-      if (res.ok) {
-        // STEP 2: If the backend call is successful, refresh both lists
-        console.log('Registration approved successfully.');
-        fetchTeamMembers();
-        fetchPendingRegistrations();
-      } else {
-        console.error('Failed to approve registration.');
-      }
-    } catch (error) {
-      console.error('Error approving registration:', error);
-    }
-    */
-
-    // This temporary frontend-only logic will be removed once you add the backend call.
-    const newMemberFromReg = {
-      id: Date.now(), // temporary ID
-      name: registration.name,
-      role: registration.requested_role,
-      bio: registration.bio || '',
-      username: registration.email.split('@')[0],
-    };
-    setTeamMembers(prev => [...prev, newMemberFromReg]);
-    setPendingRegistrations(prev => prev.filter(r => r.id !== registration.id));
-  };
-
-  const handleDecline = async (registrationId: number) => {
-    // STEP 1: Send a request to your backend to delete the registration.
-    console.log('Declining registration:', registrationId);
-
-    // --- REPLACE THIS with your actual backend API call ---
-    // Example:
-    /*
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/registrations/decline/${registrationId}/`, {
-        method: 'POST', // or 'DELETE'
-        headers: { 'Authorization': `Token ${token}` },
-      });
-
-      if (res.ok) {
-        // STEP 2: If the backend call is successful, refresh the pending list
-        console.log('Registration declined successfully.');
-        fetchPendingRegistrations();
-      } else {
-        console.error('Failed to decline registration.');
-      }
-    } catch (error) {
-      console.error('Error declining registration:', error);
-    }
-    */
-    
-    // This temporary frontend-only logic will be removed once you add the backend call.
-    setPendingRegistrations(prev => prev.filter(r => r.id !== registrationId));
-  };
-
   const openEditModal = (member: TeamMember) => {
     setEditingMember(member);
     setShowEdit(true);
@@ -289,34 +197,6 @@ const TeamAdminPage = () => {
                   </div>
                   <button onClick={() => openEditModal(member)} className="p-2 text-blue-500 hover:text-blue-700" title="Edit"><FaEdit /></button>
                   <button onClick={() => handleDeleteMember(member.id)} className="p-2 text-red-500 hover:text-red-700" title="Remove"><FaTrash /></button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Pending Registrations */}
-        <div className="mb-12">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Pending Registrations</h2>
-          {pendingRegistrations.length === 0 ? (
-            <div className="bg-gray-50 border rounded-lg p-8 text-gray-600 text-center">
-              No pending registrations.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {pendingRegistrations.map(reg => (
-                <div key={reg.id} className="flex items-center gap-4 bg-white/60 backdrop-blur rounded-xl border border-gray-200 p-4 shadow">
-                  <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 font-bold border text-xl">
-                    {reg.name[0]}
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-gray-900 text-lg">{reg.name}</div>
-                    <div className="text-sm text-gray-700">{reg.email}</div>
-                    <div className="text-xs text-blue-700 font-medium">{reg.requested_role}</div>
-                    {reg.bio && <div className="text-xs text-gray-500 mt-1">{reg.bio}</div>}
-                  </div>
-                  <button onClick={() => handleApprove(reg)} className="p-2 text-green-600 hover:text-green-800" title="Accept"><FaCheck /></button>
-                  <button onClick={() => handleDecline(reg.id)} className="p-2 text-red-500 hover:text-red-700" title="Decline"><FaTimes /></button>
                 </div>
               ))}
             </div>
