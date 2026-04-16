@@ -29,9 +29,10 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.8);
-  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(191, 208, 234, 0.7);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
 .nav-inner {
@@ -47,6 +48,7 @@ body {
 .brand {
   font-weight: 700;
   letter-spacing: 0.02em;
+  font-size: 15px;
 }
 
 .nav-links {
@@ -57,14 +59,46 @@ body {
 }
 
 .nav-links a {
+  position: relative;
   text-decoration: none;
   color: var(--muted);
   font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: color 180ms ease, background-color 180ms ease;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.nav-links a:hover {
+  color: #0b1e43;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.nav-links a:hover::after {
+  transform: scaleX(1);
 }
 
 .nav-links a.active {
-  color: var(--text);
+  color: #0b1e43;
   font-weight: 600;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.nav-links a.active::after {
+  transform: scaleX(1);
 }
 
 .page-title {
@@ -336,6 +370,14 @@ textarea {
 }
 
 @media (max-width: 760px) {
+  .nav-inner {
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    gap: 8px;
+  }
+
   .container {
     padding: 16px;
   }
