@@ -119,19 +119,50 @@ body {
 
 .hero-kicker {
   display: inline-block;
+
+.form-row label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #334155;
+  text-transform: uppercase;
+}
   margin-bottom: 10px;
   padding: 5px 10px;
   border: 1px solid #cfe0fa;
   border-radius: 999px;
-  background: #eef5ff;
+  border: 1px solid #cfd8e6;
   color: #17458a;
-  font-size: 12px;
+  padding: 10px 12px;
   font-weight: 700;
+  background: #fbfdff;
+  color: #0f172a;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .hero .page-title {
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: #b6c6df;
+  background: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16);
+  background: #ffffff;
+}
   margin: 0 0 8px;
 }
 
@@ -427,12 +458,28 @@ textarea {
   border-collapse: collapse;
 }
 
+.table thead th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #475569;
+  background: #f8fbff;
+}
+
 .table th,
 .table td {
   text-align: left;
   border-bottom: 1px solid var(--line);
   padding: 10px 8px;
   vertical-align: top;
+}
+
+.table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.table tbody tr:hover {
+  background: #f8fbff;
 }
 
 @keyframes fadeUp {
