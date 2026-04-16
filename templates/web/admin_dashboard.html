@@ -1,12 +1,17 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Admin Dashboard</h1>
-<div class="grid">
-  <a class="card" href="/admin-panel/team/"><h3>Manage Team</h3><p class="muted">Add, edit, and remove members.</p></a>
-  <a class="card" href="/admin-panel/home/"><h3>Home Page Manager</h3><p class="muted">Content controls placeholder.</p></a>
-  <a class="card" href="/admin-panel/projects/"><h3>Project Manager</h3><p class="muted">Project controls placeholder.</p></a>
-  <a class="card" href="/admin-panel/publications/"><h3>Publication Manager</h3><p class="muted">Publication controls placeholder.</p></a>
-  <a class="card" href="/admin-panel/team-members/"><h3>Team Member Manager</h3><p class="muted">Additional member tools placeholder.</p></a>
+<section class="hero">
+  <span class="hero-kicker">Control Center</span>
+  <h1 class="page-title">Admin Dashboard</h1>
+  <p class="hero-subtitle">Manage content modules and member operations from a single, structured workspace.</p>
+</section>
+
+<div class="grid admin-grid">
+  <a class="card admin-tile" href="/admin-panel/team/"><h3>Manage Team</h3><p class="muted">Add, edit, and remove members.</p><span class="tile-meta">Operations</span></a>
+  <a class="card admin-tile" href="/admin-panel/home/"><h3>Home Page Manager</h3><p class="muted">Content controls placeholder.</p><span class="tile-meta">Site Content</span></a>
+  <a class="card admin-tile" href="/admin-panel/projects/"><h3>Project Manager</h3><p class="muted">Project controls placeholder.</p><span class="tile-meta">Research Work</span></a>
+  <a class="card admin-tile" href="/admin-panel/publications/"><h3>Publication Manager</h3><p class="muted">Publication controls placeholder.</p><span class="tile-meta">Papers</span></a>
+  <a class="card admin-tile" href="/admin-panel/team-members/"><h3>Team Member Manager</h3><p class="muted">Additional member tools placeholder.</p><span class="tile-meta">Directory</span></a>
 </div>
 {% endblock %}
