@@ -46,9 +46,9 @@
                 <a class="signup-menu-item" href="/team/">As Core Member</a>
                 <a
                   class="signup-menu-item signup-menu-admin"
-                  href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
+                  href="/admin-panel/login/"
                 >
-                  As Admin
+                  Log In as Admin
                 </a>
               </div>
             </div>

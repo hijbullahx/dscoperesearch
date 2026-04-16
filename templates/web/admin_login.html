@@ -1,17 +1,23 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Admin Login</h1>
-<form method="post" class="form-panel">
-  {% csrf_token %}
-  <div class="form-row">
-    <label for="id_username">Username</label>
-    {{ form.username }}
+<section class="auth-shell">
+  <div class="auth-intro">
+    <span class="hero-kicker">Admin Access</span>
+    <h1 class="page-title">Sign in to Admin Panel</h1>
   </div>
-  <div class="form-row">
-    <label for="id_password">Password</label>
-    {{ form.password }}
-  </div>
-  <button class="btn" type="submit">Login</button>
-</form>
+
+  <form method="post" class="form-panel auth-card">
+    {% csrf_token %}
+    <div class="form-row">
+      <label for="id_username">Username</label>
+      {{ form.username }}
+    </div>
+    <div class="form-row">
+      <label for="id_password">Password</label>
+      {{ form.password }}
+    </div>
+    <button class="btn auth-submit" type="submit">Log In</button>
+  </form>
+</section>
 {% endblock %}
