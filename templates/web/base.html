@@ -16,6 +16,9 @@
           <a href="/projects/" class="{% if request.path == '/projects/' %}active{% endif %}">Projects</a>
           <a href="/publications/" class="{% if request.path == '/publications/' %}active{% endif %}">Publications</a>
           <a href="/team/" class="{% if request.path == '/team/' %}active{% endif %}">Team</a>
+          {% if request.user.is_authenticated and request.user.is_staff %}
+            <a href="/admin-panel/" class="{% if '/admin-panel/' in request.path %}active{% endif %}">Dashboard</a>
+          {% endif %}
         </div>
         <div class="nav-actions">
           <button
@@ -41,9 +44,9 @@
                 <button type="button" class="menu-close" data-signup-close aria-label="Close sign up menu">&times;</button>
               </div>
               <div class="signup-menu-list">
-                <a class="signup-menu-item" href="/team/">As Registered Member</a>
-                <a class="signup-menu-item" href="/team/">As Instructor</a>
-                <a class="signup-menu-item" href="/team/">As Core Member</a>
+                <a class="signup-menu-item" href="/login/registered-member/">As Registered Member</a>
+                <a class="signup-menu-item" href="/login/instructor/">As Instructor</a>
+                <a class="signup-menu-item" href="/login/core-member/">As Core Member</a>
                 <a
                   class="signup-menu-item signup-menu-admin"
                   href="/admin-panel/login/"

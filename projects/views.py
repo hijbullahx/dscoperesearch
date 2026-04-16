@@ -144,6 +144,48 @@ def admin_login_page(request):
     return render(request, 'web/admin_login.html', {'form': form})
 
 
+def registered_member_login_page(request):
+    if request.method == 'POST':
+        messages.success(request, 'Registered Member login will be enabled once credentials are configured.')
+    return render(
+        request,
+        'web/role_login.html',
+        {
+            'role_kicker': 'Member Access',
+            'role_title': 'Sign in as Registered Member',
+            'role_button': 'Log In',
+        },
+    )
+
+
+def instructor_login_page(request):
+    if request.method == 'POST':
+        messages.success(request, 'Instructor login will be enabled once credentials are configured.')
+    return render(
+        request,
+        'web/role_login.html',
+        {
+            'role_kicker': 'Instructor Access',
+            'role_title': 'Sign in as Instructor',
+            'role_button': 'Log In',
+        },
+    )
+
+
+def core_member_login_page(request):
+    if request.method == 'POST':
+        messages.success(request, 'Core Member login will be enabled once credentials are configured.')
+    return render(
+        request,
+        'web/role_login.html',
+        {
+            'role_kicker': 'Core Access',
+            'role_title': 'Sign in as Core Member',
+            'role_button': 'Log In',
+        },
+    )
+
+
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_logout_page(request):

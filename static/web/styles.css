@@ -231,6 +231,7 @@ body::after {
   display: inline;
 }
 
+
 .page-title {
   margin: 10px 0 24px;
   font-size: clamp(2rem, 3vw, 2.65rem);
