@@ -1,27 +1,202 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<section class="hero">
-  <span class="hero-kicker">Research Lab</span>
-  <h1 class="page-title">DeepScope Research</h1>
-  <p class="hero-subtitle">Advancing practical AI and systems research through collaborative projects, rigorous experimentation, and open technical contributions.</p>
-  <div class="hero-stats">
-    <span class="hero-stat"><strong>{{ projects|length }}</strong> projects</span>
-    <span class="hero-stat">Open research output</span>
-    <span class="hero-stat">Lab-first design</span>
+<section class="home-hero-split">
+  <div class="home-hero-copy">
+    <span class="hero-kicker">{{ content.hero_kicker }}</span>
+    <h1 class="page-title">{{ content.hero_title }}</h1>
+    <p class="hero-subtitle">{{ content.hero_subtitle }}</p>
+    <div class="hero-actions">
+      <a class="btn" href="{{ content.hero_primary_url }}">{{ content.hero_primary_label }}</a>
+      <a class="btn btn-ghost" href="{{ content.hero_secondary_url }}">{{ content.hero_secondary_label }}</a>
+    </div>
+    <div class="home-hero-strip">
+      <span>{{ featured_projects|length }} featured projects</span>
+      <span>{{ featured_publications|length }} publications</span>
+      <span>{{ featured_team_members|length }} core members</span>
+    </div>
+  </div>
+  <aside class="home-hero-radar">
+    <div class="radar-core"></div>
+    <div class="radar-ring radar-ring-one"></div>
+    <div class="radar-ring radar-ring-two"></div>
+    <div class="radar-ring radar-ring-three"></div>
+    <div class="radar-note">
+      <strong>Live research flow</strong>
+      <span>Projects, publications, and people connected in one system.</span>
+    </div>
+  </aside>
+</section>
+
+<section class="home-band">
+  <div>
+    <h2 class="section-title">{{ content.about_title }}</h2>
+    <p class="home-lead">{{ content.about_intro }}</p>
+  </div>
+  <div class="home-mission">
+    <span class="home-mission-label">Mission</span>
+    <p>{{ content.about_mission }}</p>
   </div>
 </section>
-<div class="grid">
-  {% for project in projects %}
-    <article class="card project-card">
-      <h3>{{ project.title }}</h3>
-      <p class="project-summary">{{ project.description }}</p>
-      {% if project.github_link %}
-        <a class="btn project-link" href="{{ project.github_link }}" target="_blank" rel="noreferrer">View Project</a>
-      {% endif %}
-    </article>
-  {% empty %}
-    <div class="card muted">No projects yet.</div>
-  {% endfor %}
-</div>
+
+<section class="section-panel section-lift">
+  <div class="section-head">
+    <h2 class="section-title">{{ content.research_title }}</h2>
+  </div>
+  <div class="research-grid">
+    {% for area in research_areas %}
+      <button class="research-tile" type="button" data-research-area="{{ area|escape }}">
+        <span>{{ area }}</span>
+        <small>Explore</small>
+      </button>
+    {% empty %}
+      <div class="muted">No research areas configured.</div>
+    {% endfor %}
+  </div>
+  <div class="research-focus" id="research-focus">
+    <strong>Selected area</strong>
+    <p>Click a research area to spotlight it here.</p>
+  </div>
+</section>
+
+<section class="section-panel section-lift">
+  <div class="section-head">
+    <h2 class="section-title">{{ content.featured_projects_title }}</h2>
+    <a class="section-link" href="/projects/">View all projects</a>
+  </div>
+  <div class="home-scroller" id="project-scroller">
+    {% for project in featured_projects %}
+      <button class="spotlight-item" type="button" data-project-title="{{ project.title|escape }}" data-project-summary="{{ project.description|escape }}" data-project-link="{{ project.github_link|default:''|escape }}">
+        <span class="spotlight-index">0{{ forloop.counter }}</span>
+        <strong>{{ project.title }}</strong>
+        <p>{{ project.description|truncatechars:120 }}</p>
+      </button>
+    {% empty %}
+      <div class="muted">No featured projects selected.</div>
+    {% endfor %}
+  </div>
+  <div class="spotlight-detail" id="project-detail">
+    {% if featured_projects %}
+      {% with featured_projects|first as first_project %}
+        <strong>{{ first_project.title }}</strong>
+        <p>{{ first_project.description }}</p>
+        {% if first_project.github_link %}
+          <a class="btn btn-ghost" href="{{ first_project.github_link }}" target="_blank" rel="noreferrer">View Project</a>
+        {% endif %}
+      {% endwith %}
+    {% else %}
+      <strong>No featured projects</strong>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section-panel section-lift">
+  <div class="section-head">
+    <h2 class="section-title">{{ content.featured_publications_title }}</h2>
+    <a class="section-link" href="/publications/">Full publications page</a>
+  </div>
+  <div class="pub-list">
+    {% for publication in featured_publications %}
+      <details class="pub-item" {% if forloop.first %}open{% endif %}>
+        <summary>
+          <strong>{{ publication.title }}</strong>
+          <span>{% if publication.authors %}{{ publication.authors }}{% else %}Publication{% endif %}</span>
+        </summary>
+        <div class="pub-body">
+          {% if publication.summary %}<p>{{ publication.summary }}</p>{% endif %}
+          {% if publication.publication_link %}
+            <a class="btn btn-ghost" href="{{ publication.publication_link }}" target="_blank" rel="noreferrer">Read paper</a>
+          {% endif %}
+        </div>
+      </details>
+    {% empty %}
+      <div class="muted">No publications selected yet.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section-panel section-lift">
+  <div class="section-head">
+    <h2 class="section-title">{{ content.team_preview_title }}</h2>
+    <a class="section-link" href="/team/">View full team</a>
+  </div>
+  <div class="home-team-row">
+    {% for member in featured_team_members %}
+      <button class="team-badge" type="button" data-member-name="{{ member.name|escape }}" data-member-role="{{ member.role|escape }}">
+        {% if member.photo %}
+          <img class="avatar-sm" src="{{ member.photo.url }}" alt="{{ member.name }}">
+        {% else %}
+          <span class="avatar-fallback-sm">{{ member.name|slice:':1' }}</span>
+        {% endif %}
+        <span>{{ member.name }}</span>
+      </button>
+    {% empty %}
+      <div class="muted">No team members selected.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section-panel section-lift">
+  <div class="section-head">
+    <h2 class="section-title">{{ content.news_title }}</h2>
+  </div>
+  <div class="news-rail">
+    {% for item in news_items %}
+      <div class="news-item">{{ item }}</div>
+    {% empty %}
+      <div class="muted">No updates available.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="cta-slab">
+  <div>
+    <h2>{{ content.cta_title }}</h2>
+    <p>{{ content.cta_description }}</p>
+  </div>
+  <div class="hero-actions">
+    <a class="btn" href="{{ content.cta_primary_url }}">{{ content.cta_primary_label }}</a>
+    <a class="btn btn-ghost" href="{{ content.cta_secondary_url }}">{{ content.cta_secondary_label }}</a>
+  </div>
+</section>
+
+<footer class="home-footer home-footer-flat">
+  <div>
+    <h3>{{ content.footer_contact_title }}</h3>
+    <p>{{ content.footer_email }}</p>
+  </div>
+  <div>
+    <h3>{{ content.footer_social_title }}</h3>
+    <div class="footer-links">
+      {% for link in social_links %}
+        <span>{{ link }}</span>
+      {% empty %}
+        <span class="muted">No social links added.</span>
+      {% endfor %}
+    </div>
+  </div>
+  <div>
+    <h3>University</h3>
+    <p>{{ content.footer_university_info }}</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const researchFocus = document.getElementById('research-focus');
+    document.querySelectorAll('[data-research-area]').forEach((button) => {
+      button.addEventListener('click', () => {
+        researchFocus.innerHTML = '<strong>' + button.dataset.researchArea + '</strong><p>Active research area selected from the homepage.</p>';
+      });
+    });
+
+    const projectDetail = document.getElementById('project-detail');
+    document.querySelectorAll('[data-project-title]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const link = button.dataset.projectLink;
+        projectDetail.innerHTML = '<strong>' + button.dataset.projectTitle + '</strong><p>' + button.dataset.projectSummary + '</p>' + (link ? '<a class="btn btn-ghost" href="' + link + '" target="_blank" rel="noreferrer">View Project</a>' : '');
+      });
+    });
+  })();
+</script>
 {% endblock %}

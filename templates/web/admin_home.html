@@ -1,6 +1,103 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Home Page Manager</h1>
-<div class="card muted">Home page management UI coming soon.</div>
+<section class="hero">
+	<span class="hero-kicker">Home Page Manager</span>
+	<h1 class="page-title">Edit Homepage Content</h1>
+	<p class="hero-subtitle">Control the public homepage sections, featured items, CTA labels, and footer content from one place.</p>
+</section>
+
+<section class="grid" style="margin-bottom: 16px;">
+	<div class="card"><strong>{{ project_count }}</strong><br><span class="muted">Projects available</span></div>
+	<div class="card"><strong>{{ publication_count }}</strong><br><span class="muted">Publications available</span></div>
+	<div class="card"><strong>{{ team_count }}</strong><br><span class="muted">Team members available</span></div>
+</section>
+
+<form method="post" class="stacked-home-form">
+	{% csrf_token %}
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">Hero Section</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Kicker</label>{{ form.hero_kicker }}</div>
+			<div class="form-row"><label>Title</label>{{ form.hero_title }}</div>
+			<div class="form-row admin-team-wide"><label>Subtitle</label>{{ form.hero_subtitle }}</div>
+			<div class="form-row"><label>Primary Button</label>{{ form.hero_primary_label }}</div>
+			<div class="form-row"><label>Primary URL</label>{{ form.hero_primary_url }}</div>
+			<div class="form-row"><label>Secondary Button</label>{{ form.hero_secondary_label }}</div>
+			<div class="form-row"><label>Secondary URL</label>{{ form.hero_secondary_url }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">About / Mission</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.about_title }}</div>
+			<div class="form-row admin-team-wide"><label>Intro</label>{{ form.about_intro }}</div>
+			<div class="form-row admin-team-wide"><label>Mission</label>{{ form.about_mission }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">Research Areas</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.research_title }}</div>
+			<div class="form-row admin-team-wide"><label>Areas</label>{{ form.research_areas }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">Featured Projects</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.featured_projects_title }}</div>
+			<div class="form-row admin-team-wide"><label>Select Projects</label>{{ form.featured_projects }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">Publications Preview</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.featured_publications_title }}</div>
+			<div class="form-row admin-team-wide"><label>Select Publications</label>{{ form.featured_publications }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">Team Preview</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.team_preview_title }}</div>
+			<div class="form-row admin-team-wide"><label>Select Core Members</label>{{ form.featured_team_members }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">News / Blog</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>Section Title</label>{{ form.news_title }}</div>
+			<div class="form-row admin-team-wide"><label>News Items</label>{{ form.news_items }}</div>
+		</div>
+	</section>
+
+	<section class="section-panel">
+		<div class="section-head"><h2 class="section-title">CTA / Footer</h2></div>
+		<div class="card admin-home-card-grid">
+			<div class="form-row"><label>CTA Title</label>{{ form.cta_title }}</div>
+			<div class="form-row admin-team-wide"><label>CTA Description</label>{{ form.cta_description }}</div>
+			<div class="form-row"><label>Primary Label</label>{{ form.cta_primary_label }}</div>
+			<div class="form-row"><label>Primary URL</label>{{ form.cta_primary_url }}</div>
+			<div class="form-row"><label>Secondary Label</label>{{ form.cta_secondary_label }}</div>
+			<div class="form-row"><label>Secondary URL</label>{{ form.cta_secondary_url }}</div>
+			<div class="form-row"><label>Contact Title</label>{{ form.footer_contact_title }}</div>
+			<div class="form-row"><label>Email</label>{{ form.footer_email }}</div>
+			<div class="form-row"><label>Social Title</label>{{ form.footer_social_title }}</div>
+			<div class="form-row admin-team-wide"><label>University Info</label>{{ form.footer_university_info }}</div>
+			<div class="form-row admin-team-wide"><label>Social Links</label>{{ form.footer_social_links }}</div>
+		</div>
+	</section>
+
+	<div class="admin-team-actions" style="justify-content: flex-end; margin-top: 16px;">
+		<button class="btn" type="submit">Save Homepage</button>
+		<a class="btn btn-ghost" href="/">Preview Homepage</a>
+	</div>
+</form>
 {% endblock %}

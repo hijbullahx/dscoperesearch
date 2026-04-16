@@ -10,8 +10,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import AdminLoginForm, PendingRegistrationForm, TeamMemberAdminForm
-from .models import PendingRegistration, Project, TeamMember
+from .forms import AdminLoginForm, HomePageContentForm, PendingRegistrationForm, PublicationAdminForm, TeamMemberAdminForm
+from .models import HomePageContent, PendingRegistration, Project, Publication, TeamMember
 from .serializers import PendingRegistrationSerializer, TeamMemberSerializer
 
 
@@ -46,6 +46,14 @@ def project_list(request):
 
     return Response(data)
 
+
+def _split_lines(text_value):
+    return [line.strip() for line in (text_value or '').splitlines() if line.strip()]
+
+
+def _home_content():
+    return HomePageContent.get_solo()
+
 class TeamMemberViewSet(viewsets.ModelViewSet):
     queryset = TeamMember.objects.all()
     serializer_class = TeamMemberSerializer
@@ -74,13 +82,26 @@ class PendingRegistrationViewSet(viewsets.ModelViewSet):
         user.password = registration.password_hash
         user.save()
 
+        next_position = (
+            TeamMember.objects.filter(role=registration.requested_role)
+            .order_by('-position')
+            .values_list('position', flat=True)
+            .first()
+        )
+        next_position = (next_position or 0) + 1
+
         # Create a new team member
         team_member = TeamMember.objects.create(
             user=user,
             name=registration.name,
             role=registration.requested_role,
-            position=999,
-            bio=registration.bio
+            position=next_position,
+            bio=registration.bio,
+            photo=registration.photo,
+            google_scholar=registration.google_scholar,
+            github=registration.github,
+            linkedin=registration.linkedin,
+            website=registration.website,
         )
         
         # Delete the pending registration
@@ -96,8 +117,24 @@ class PendingRegistrationViewSet(viewsets.ModelViewSet):
 
 
 def home_page(request):
-    projects = Project.objects.order_by('-created_at')
-    return render(request, 'web/home.html', {'projects': projects})
+    content = _home_content()
+    featured_projects = content.featured_projects.all()[:3]
+    featured_publications = content.featured_publications.all()[:3]
+    featured_team_members = content.featured_team_members.all()[:3]
+
+    return render(
+        request,
+        'web/home.html',
+        {
+            'content': content,
+            'research_areas': _split_lines(content.research_areas),
+            'news_items': _split_lines(content.news_items),
+            'social_links': _split_lines(content.footer_social_links),
+            'featured_projects': featured_projects,
+            'featured_publications': featured_publications,
+            'featured_team_members': featured_team_members,
+        },
+    )
 
 
 def projects_page(request):
@@ -358,7 +395,25 @@ def admin_dashboard_page(request):
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_home_manager_page(request):
-    return render(request, 'web/admin_home.html')
+    content = _home_content()
+    form = HomePageContentForm(request.POST or None, instance=content)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Home page content updated.')
+        return redirect('admin-home-manager-page')
+
+    return render(
+        request,
+        'web/admin_home.html',
+        {
+            'form': form,
+            'content': content,
+            'project_count': Project.objects.count(),
+            'publication_count': Publication.objects.count(),
+            'team_count': TeamMember.objects.count(),
+        },
+    )
 
 
 @login_required(login_url='admin-login-page')
@@ -370,7 +425,48 @@ def admin_projects_manager_page(request):
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_publications_manager_page(request):
-    return render(request, 'web/admin_publications.html')
+    publications = Publication.objects.order_by('-created_at')
+    form = PublicationAdminForm(request.POST or None)
+    editing_publication = None
+    editing_publication_id = request.GET.get('edit')
+
+    if editing_publication_id:
+        editing_publication = Publication.objects.filter(id=editing_publication_id).first()
+        if editing_publication:
+            form = PublicationAdminForm(instance=editing_publication)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'delete':
+            publication_id = request.POST.get('publication_id')
+            publication = Publication.objects.filter(id=publication_id).first()
+            if publication:
+                publication.delete()
+                messages.success(request, 'Publication deleted.')
+            else:
+                messages.error(request, 'Publication not found.')
+            return redirect('admin-publications-manager-page')
+
+        if action in {'add', 'edit'}:
+            publication_instance = None
+            if action == 'edit':
+                publication_instance = Publication.objects.filter(id=request.POST.get('publication_id')).first()
+            form = PublicationAdminForm(request.POST, instance=publication_instance)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Publication saved.')
+                return redirect('admin-publications-manager-page')
+
+    return render(
+        request,
+        'web/admin_publications.html',
+        {
+            'publications': publications,
+            'form': form,
+            'editing_publication': editing_publication,
+        },
+    )
 
 
 @login_required(login_url='admin-login-page')

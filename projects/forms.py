@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import PendingRegistration, TeamMember
+from .models import HomePageContent, PendingRegistration, Publication, Project, TeamMember
 
 
 class AdminLoginForm(forms.Form):
@@ -102,3 +102,79 @@ class PendingRegistrationForm(forms.ModelForm):
         if PendingRegistration.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('A request with this email already exists.')
         return email
+
+
+class PublicationAdminForm(forms.ModelForm):
+    class Meta:
+        model = Publication
+        fields = ['title', 'authors', 'summary', 'publication_link', 'published_at']
+
+
+class HomePageContentForm(forms.ModelForm):
+    featured_projects = forms.ModelMultipleChoiceField(
+        queryset=Project.objects.order_by('-created_at'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'choice-list'}),
+    )
+    featured_publications = forms.ModelMultipleChoiceField(
+        queryset=Publication.objects.order_by('-created_at'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'choice-list'}),
+    )
+    featured_team_members = forms.ModelMultipleChoiceField(
+        queryset=TeamMember.objects.filter(role__icontains='core').order_by('position', 'name'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'choice-list'}),
+    )
+
+    class Meta:
+        model = HomePageContent
+        fields = [
+            'hero_kicker',
+            'hero_title',
+            'hero_subtitle',
+            'hero_primary_label',
+            'hero_primary_url',
+            'hero_secondary_label',
+            'hero_secondary_url',
+            'about_title',
+            'about_intro',
+            'about_mission',
+            'research_title',
+            'research_areas',
+            'featured_projects_title',
+            'featured_publications_title',
+            'team_preview_title',
+            'news_title',
+            'cta_title',
+            'cta_description',
+            'cta_primary_label',
+            'cta_primary_url',
+            'cta_secondary_label',
+            'cta_secondary_url',
+            'footer_contact_title',
+            'footer_email',
+            'footer_social_title',
+            'footer_university_info',
+            'news_items',
+            'footer_social_links',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['featured_projects'].initial = self.instance.featured_projects.all()
+            self.fields['featured_publications'].initial = self.instance.featured_publications.all()
+            self.fields['featured_team_members'].initial = self.instance.featured_team_members.all()
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
+    def save_m2m(self):
+        self.instance.featured_projects.set(self.cleaned_data.get('featured_projects', []))
+        self.instance.featured_publications.set(self.cleaned_data.get('featured_publications', []))
+        self.instance.featured_team_members.set(self.cleaned_data.get('featured_team_members', []))

@@ -1,6 +1,66 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Publication Manager</h1>
-<div class="card muted">Publication management UI coming soon.</div>
+<section class="hero">
+	<span class="hero-kicker">Publication Manager</span>
+	<h1 class="page-title">Manage Publications</h1>
+</section>
+
+<section class="section-panel">
+	<div class="section-head">
+		<h2 class="section-title">{% if editing_publication %}Edit Publication{% else %}Add Publication{% endif %}</h2>
+	</div>
+	<div class="card admin-home-card-grid">
+		<form method="post" class="admin-home-card-grid" style="width: 100%;">
+			{% csrf_token %}
+			<input type="hidden" name="action" value="{% if editing_publication %}edit{% else %}add{% endif %}">
+			{% if editing_publication %}
+				<input type="hidden" name="publication_id" value="{{ editing_publication.id }}">
+			{% endif %}
+
+			<div class="form-row"><label>Title</label>{{ form.title }}</div>
+			<div class="form-row"><label>Authors</label>{{ form.authors }}</div>
+			<div class="form-row admin-team-wide"><label>Summary</label>{{ form.summary }}</div>
+			<div class="form-row"><label>Publication Link</label>{{ form.publication_link }}</div>
+			<div class="form-row"><label>Published At</label>{{ form.published_at }}</div>
+
+			<div class="admin-team-actions" style="grid-column: 1 / -1; justify-content: flex-end;">
+				<button class="btn" type="submit">{% if editing_publication %}Save Changes{% else %}Add Publication{% endif %}</button>
+				{% if editing_publication %}
+					<a class="btn btn-ghost" href="/admin-panel/publications/">Cancel</a>
+				{% endif %}
+			</div>
+		</form>
+	</div>
+</section>
+
+<section class="section-panel">
+	<div class="section-head">
+		<h2 class="section-title">Existing Publications</h2>
+	</div>
+	<div class="admin-member-list">
+		{% for publication in publications %}
+			<article class="admin-member-row">
+				<div class="admin-member-main" style="align-items: flex-start;">
+					<div class="admin-member-meta" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+						<span class="admin-member-name">{{ publication.title }}</span>
+						{% if publication.authors %}<span class="muted">{{ publication.authors }}</span>{% endif %}
+						{% if publication.summary %}<span class="muted">{{ publication.summary|truncatechars:120 }}</span>{% endif %}
+					</div>
+				</div>
+				<div class="admin-member-actions">
+					<a class="admin-mini-btn admin-mini-btn-primary" href="/admin-panel/publications/?edit={{ publication.id }}">Edit</a>
+					<form class="admin-inline-form" method="post" onsubmit="return confirm('Delete this publication?');">
+						{% csrf_token %}
+						<input type="hidden" name="action" value="delete">
+						<input type="hidden" name="publication_id" value="{{ publication.id }}">
+						<button class="admin-mini-btn admin-mini-btn-danger" type="submit">Delete</button>
+					</form>
+				</div>
+			</article>
+		{% empty %}
+			<div class="card muted">No publications found.</div>
+		{% endfor %}
+	</div>
+</section>
 {% endblock %}
