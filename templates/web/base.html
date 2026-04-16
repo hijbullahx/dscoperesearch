@@ -16,18 +16,63 @@
           <a href="/projects/" class="{% if request.path == '/projects/' %}active{% endif %}">Projects</a>
           <a href="/publications/" class="{% if request.path == '/publications/' %}active{% endif %}">Publications</a>
           <a href="/team/" class="{% if request.path == '/team/' %}active{% endif %}">Team</a>
+        </div>
+        <div class="nav-actions">
+          <button
+            type="button"
+            class="btn nav-cta"
+            data-signup-open
+            aria-haspopup="dialog"
+            aria-controls="signup-drawer"
+            aria-expanded="false"
+          >
+            Sign Up
+          </button>
           {% if request.user.is_authenticated and request.user.is_staff %}
-            <a href="/admin-panel/" class="{% if '/admin-panel/' in request.path %}active{% endif %}">Admin Panel</a>
-            <form method="post" action="/admin-panel/logout/" style="display:inline;">
+            <form method="post" action="/admin-panel/logout/" class="nav-logout-form">
               {% csrf_token %}
               <button class="btn btn-danger" type="submit">Logout</button>
             </form>
-          {% else %}
-            <a href="/admin-panel/login/" class="{% if request.path == '/admin-panel/login/' %}active{% endif %}">Admin Login</a>
           {% endif %}
         </div>
       </div>
     </nav>
+
+    <div class="drawer-backdrop" data-signup-close></div>
+    <aside id="signup-drawer" class="signup-drawer" aria-hidden="true" aria-label="Sign Up menu">
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <div>
+            <span class="hero-kicker">Join DeepScope</span>
+            <h2 class="drawer-title">Choose your access path</h2>
+          </div>
+          <button type="button" class="drawer-close" data-signup-close aria-label="Close sign up menu">&times;</button>
+        </div>
+        <p class="drawer-copy">Select the role that matches how you want to interact with the lab.</p>
+
+        <div class="drawer-list">
+          <a class="drawer-item" href="/team/">
+            <strong>As Registered Member</strong>
+            <span>Explore the public team directory and current research activity.</span>
+          </a>
+          <a class="drawer-item" href="/team/">
+            <strong>As Instructor</strong>
+            <span>Review the team structure and collaboration areas.</span>
+          </a>
+          <a class="drawer-item" href="/team/">
+            <strong>As Core Member</strong>
+            <span>See the core research group and member profiles.</span>
+          </a>
+          <a
+            class="drawer-item drawer-item-emphasis"
+            href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
+          >
+            <strong>As Admin</strong>
+            <span>Open the admin dashboard and manage site content.</span>
+          </a>
+        </div>
+      </div>
+    </aside>
 
     <main class="container">
       {% if messages %}
@@ -37,5 +82,33 @@
       {% endif %}
       {% block content %}{% endblock %}
     </main>
+
+    <script>
+      (function () {
+        const body = document.body;
+        const drawer = document.getElementById('signup-drawer');
+        const openers = document.querySelectorAll('[data-signup-open]');
+        const closers = document.querySelectorAll('[data-signup-close]');
+
+        if (!drawer || !openers.length) {
+          return;
+        }
+
+        const setOpen = (isOpen) => {
+          body.classList.toggle('signup-open', isOpen);
+          drawer.setAttribute('aria-hidden', String(!isOpen));
+          openers.forEach((button) => button.setAttribute('aria-expanded', String(isOpen)));
+        };
+
+        openers.forEach((button) => button.addEventListener('click', () => setOpen(true)));
+        closers.forEach((element) => element.addEventListener('click', () => setOpen(false)));
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            setOpen(false);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
