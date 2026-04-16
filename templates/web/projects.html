@@ -1,7 +1,11 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Projects</h1>
+<section class="hero">
+  <span class="hero-kicker">Work Portfolio</span>
+  <h1 class="page-title">Projects</h1>
+  <p class="hero-subtitle">Explore active and completed research efforts from DeepScope members, including engineering prototypes and open-source outcomes.</p>
+</section>
 <div class="grid">
   {% for project in projects %}
     <article class="card">

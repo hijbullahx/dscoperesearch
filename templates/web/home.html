@@ -1,7 +1,11 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">DeepScope Research</h1>
+<section class="hero">
+  <span class="hero-kicker">Research Lab</span>
+  <h1 class="page-title">DeepScope Research</h1>
+  <p class="hero-subtitle">Advancing practical AI and systems research through collaborative projects, rigorous experimentation, and open technical contributions.</p>
+</section>
 <div class="grid">
   {% for project in projects %}
     <article class="card">
