@@ -22,8 +22,8 @@
             type="button"
             class="btn nav-cta"
             data-signup-open
-            aria-haspopup="dialog"
-            aria-controls="signup-drawer"
+            aria-haspopup="menu"
+            aria-controls="signup-menu"
             aria-expanded="false"
           >
             Sign Up
@@ -34,45 +34,37 @@
               <button class="btn btn-danger" type="submit">Logout</button>
             </form>
           {% endif %}
+
+          <div id="signup-menu" class="signup-menu" aria-hidden="true">
+            <div class="signup-menu-panel">
+              <div class="signup-menu-head">
+                <span class="hero-kicker">Join</span>
+                <button type="button" class="menu-close" data-signup-close aria-label="Close sign up menu">&times;</button>
+              </div>
+              <a class="signup-menu-item" href="/team/">
+                <strong>As Registered Member</strong>
+                <span>View the public team directory.</span>
+              </a>
+              <a class="signup-menu-item" href="/team/">
+                <strong>As Instructor</strong>
+                <span>Explore the research group structure.</span>
+              </a>
+              <a class="signup-menu-item" href="/team/">
+                <strong>As Core Member</strong>
+                <span>Open the core member team view.</span>
+              </a>
+              <a
+                class="signup-menu-item signup-menu-admin"
+                href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
+              >
+                <strong>As Admin</strong>
+                <span>Open the admin dashboard.</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
-
-    <div class="drawer-backdrop" data-signup-close></div>
-    <aside id="signup-drawer" class="signup-drawer" aria-hidden="true" aria-label="Sign Up menu">
-      <div class="drawer-panel">
-        <div class="drawer-header">
-          <div>
-            <span class="hero-kicker">Join DeepScope</span>
-            <h2 class="drawer-title">Choose your access path</h2>
-          </div>
-          <button type="button" class="drawer-close" data-signup-close aria-label="Close sign up menu">&times;</button>
-        </div>
-        <p class="drawer-copy">Select the role that matches how you want to interact with the lab.</p>
-
-        <div class="drawer-list">
-          <a class="drawer-item" href="/team/">
-            <strong>As Registered Member</strong>
-            <span>Explore the public team directory and current research activity.</span>
-          </a>
-          <a class="drawer-item" href="/team/">
-            <strong>As Instructor</strong>
-            <span>Review the team structure and collaboration areas.</span>
-          </a>
-          <a class="drawer-item" href="/team/">
-            <strong>As Core Member</strong>
-            <span>See the core research group and member profiles.</span>
-          </a>
-          <a
-            class="drawer-item drawer-item-emphasis"
-            href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
-          >
-            <strong>As Admin</strong>
-            <span>Open the admin dashboard and manage site content.</span>
-          </a>
-        </div>
-      </div>
-    </aside>
 
     <main class="container">
       {% if messages %}
@@ -86,22 +78,34 @@
     <script>
       (function () {
         const body = document.body;
-        const drawer = document.getElementById('signup-drawer');
+        const menu = document.getElementById('signup-menu');
         const openers = document.querySelectorAll('[data-signup-open]');
         const closers = document.querySelectorAll('[data-signup-close]');
 
-        if (!drawer || !openers.length) {
+        if (!menu || !openers.length) {
           return;
         }
 
         const setOpen = (isOpen) => {
           body.classList.toggle('signup-open', isOpen);
-          drawer.setAttribute('aria-hidden', String(!isOpen));
+          menu.classList.toggle('is-open', isOpen);
+          menu.setAttribute('aria-hidden', String(!isOpen));
           openers.forEach((button) => button.setAttribute('aria-expanded', String(isOpen)));
         };
 
         openers.forEach((button) => button.addEventListener('click', () => setOpen(true)));
         closers.forEach((element) => element.addEventListener('click', () => setOpen(false)));
+
+        document.addEventListener('click', (event) => {
+          const target = event.target;
+          if (!menu.classList.contains('is-open')) {
+            return;
+          }
+          if (menu.contains(target) || Array.from(openers).some((button) => button.contains(target))) {
+            return;
+          }
+          setOpen(false);
+        });
 
         document.addEventListener('keydown', (event) => {
           if (event.key === 'Escape') {
