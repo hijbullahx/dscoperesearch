@@ -226,6 +226,33 @@ body::after {
   font-size: 0.96rem;
 }
 
+.project-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.project-card h3 {
+  margin-bottom: 8px;
+}
+
+.project-summary {
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-link {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
 .card.muted {
   position: relative;
   border-style: dashed;
