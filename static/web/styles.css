@@ -79,12 +79,35 @@ body {
   gap: 16px;
 }
 
+.grid > .card {
+  animation: fadeUp 440ms ease both;
+}
+
+.grid > .card:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.grid > .card:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.grid > .card:nth-child(4) {
+  animation-delay: 150ms;
+}
+
 .card {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #bfd0ea;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
 }
 
 .card h3 {
@@ -130,12 +153,35 @@ button.btn-danger {
   gap: 14px;
 }
 
+.member-list > .member {
+  animation: fadeUp 460ms ease both;
+}
+
+.member-list > .member:nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.member-list > .member:nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.member-list > .member:nth-child(4) {
+  animation-delay: 135ms;
+}
+
 .member {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 14px;
   text-align: center;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.member:hover {
+  transform: translateY(-3px);
+  border-color: #bfd0ea;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.1);
 }
 
 .avatar,
@@ -150,6 +196,12 @@ button.btn-danger {
 .avatar {
   width: 84px;
   height: 84px;
+  transition: transform 220ms ease;
+}
+
+.member:hover .avatar,
+.member:hover .avatar-fallback {
+  transform: scale(1.04);
 }
 
 .avatar-sm {
@@ -257,6 +309,30 @@ textarea {
   border-bottom: 1px solid var(--line);
   padding: 10px 8px;
   vertical-align: top;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid > .card,
+  .member-list > .member {
+    animation: none;
+  }
+
+  .card,
+  .member,
+  .avatar {
+    transition: none;
+  }
 }
 
 @media (max-width: 760px) {
