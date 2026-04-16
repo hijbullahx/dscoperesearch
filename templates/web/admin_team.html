@@ -47,29 +47,36 @@
 {% endif %}
 
 {% if edit_form %}
-  <section class="card admin-team-card" style="margin-top: 14px;">
-    <h3>Edit Member</h3>
-    <form method="post" enctype="multipart/form-data" class="admin-team-form-grid">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="edit">
-      <input type="hidden" name="member_id" value="{{ editing_member_id }}">
-
-      <div class="form-row"><label>Name</label>{{ edit_form.name }}</div>
-      <div class="form-row"><label>Role</label>{{ edit_form.role }}</div>
-      <div class="form-row admin-team-wide"><label>Bio</label>{{ edit_form.bio }}</div>
-      <div class="form-row"><label>Photo</label>{{ edit_form.photo }}</div>
-      <div class="form-row"><label>Google Scholar</label>{{ edit_form.google_scholar }}</div>
-      <div class="form-row"><label>GitHub</label>{{ edit_form.github }}</div>
-      <div class="form-row"><label>LinkedIn</label>{{ edit_form.linkedin }}</div>
-      <div class="form-row"><label>Website</label>{{ edit_form.website }}</div>
-      <div class="form-row"><label>Username (optional)</label>{{ edit_form.username }}</div>
-      <div class="form-row"><label>Password (optional)</label>{{ edit_form.password }}</div>
-
-      <div class="admin-team-actions">
-        <button class="btn" type="submit">Save Changes</button>
-        <a class="btn btn-ghost" href="/admin-panel/team/">Cancel</a>
+  <div class="modal-backdrop"></div>
+  <section class="modal-shell" role="dialog" aria-modal="true" aria-label="Edit Member">
+    <div class="card admin-team-card modal-card">
+      <div class="modal-head">
+        <h3>Edit Member</h3>
+        <a class="btn btn-ghost" href="/admin-panel/team/">Close</a>
       </div>
-    </form>
+      <form method="post" enctype="multipart/form-data" class="admin-team-form-grid">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="member_id" value="{{ editing_member_id }}">
+
+        <div class="form-row"><label>Name *</label>{{ edit_form.name }}</div>
+        <div class="form-row"><label>Role *</label>{{ edit_form.role }}</div>
+        <div class="form-row admin-team-wide"><label>Bio</label>{{ edit_form.bio }}</div>
+        <div class="form-row"><label>Photo</label>{{ edit_form.photo }}</div>
+        <div class="form-row"><label>Google Scholar</label>{{ edit_form.google_scholar }}</div>
+        <div class="form-row"><label>GitHub</label>{{ edit_form.github }}</div>
+        <div class="form-row"><label>LinkedIn</label>{{ edit_form.linkedin }}</div>
+        <div class="form-row"><label>Website</label>{{ edit_form.website }}</div>
+        <div class="form-row"><label>Username</label>{{ edit_form.username }}</div>
+        <div class="form-row"><label>Password</label>{{ edit_form.password }}</div>
+        <div class="admin-team-wide muted" style="font-size: 12px;">Leave password empty to keep the current password.</div>
+
+        <div class="admin-team-actions">
+          <button class="btn" type="submit">Save Changes</button>
+          <a class="btn btn-ghost" href="/admin-panel/team/">Cancel</a>
+        </div>
+      </form>
+    </div>
   </section>
 {% endif %}
 
@@ -77,26 +84,25 @@
   <h3>Current Members</h3>
   <div class="admin-member-list">
     {% for member in members %}
-      <article class="admin-member-item">
-        <div class="row">
+      <article class="admin-member-row">
+        <div class="admin-member-main">
           {% if member.photo %}
             <img class="avatar-sm" src="{{ member.photo.url }}" alt="{{ member.name }}">
           {% else %}
             <span class="avatar-fallback-sm">{{ member.name|slice:':1' }}</span>
           {% endif %}
-          <div>
-            <div class="admin-member-name">{{ member.name }}</div>
-            <div class="muted">{{ member.role|default:'-' }}</div>
+          <div class="admin-member-meta">
+            <span class="admin-member-name">{{ member.name }}</span>
+            <span class="admin-role-badge">{{ member.role|default:'No Role' }}</span>
           </div>
         </div>
-        <p class="muted">{{ member.bio|default:'-' }}</p>
-        <div class="row">
-          <a class="btn btn-ghost" href="/admin-panel/team/?edit={{ member.id }}">Edit</a>
-          <form method="post" onsubmit="return confirm('Remove this member?');">
+        <div class="admin-member-actions">
+          <a class="admin-mini-btn admin-mini-btn-primary" href="/admin-panel/team/?edit={{ member.id }}">Edit</a>
+          <form class="admin-inline-form" method="post" onsubmit="return confirm('Remove this member?');">
             {% csrf_token %}
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="member_id" value="{{ member.id }}">
-            <button class="btn btn-danger" type="submit">Delete</button>
+            <button class="admin-mini-btn admin-mini-btn-danger" type="submit">Delete</button>
           </form>
         </div>
       </article>

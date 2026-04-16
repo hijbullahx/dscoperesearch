@@ -557,6 +557,27 @@ button.btn-danger {
   transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 
+.member-open,
+.member-name-open {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.member-name-open {
+  font-weight: 600;
+  color: #123a76;
+}
+
+.member-name-open:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .member:hover {
   transform: translateY(-3px);
   border-color: #bfd0ea;
@@ -667,6 +688,84 @@ button.btn-danger {
 .member p a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.member-public-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+}
+
+.member-public-modal.is-open {
+  display: block;
+}
+
+.member-modal-open {
+  overflow: hidden;
+}
+
+.member-public-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.member-public-card {
+  position: relative;
+  width: min(680px, 92vw);
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  margin: 60px auto 0;
+  background: #ffffff;
+  border: 1px solid #d6e1f1;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+  padding: 18px;
+}
+
+.member-public-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d1dbeb;
+  border-radius: 999px;
+  background: #f8fbff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.member-public-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.member-public-name {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.member-public-role {
+  margin: 4px 0 0;
+  color: #1f4d8f;
+  font-weight: 600;
+}
+
+.member-public-bio {
+  margin: 14px 0 0;
+  color: #334155;
+}
+
+.member-public-links {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .form-panel {
@@ -947,23 +1046,86 @@ select:focus {
 
 .admin-member-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
-.admin-member-item {
-  border: 1px solid #d9e3f2;
-  border-radius: 12px;
-  padding: 12px;
-  background: #fbfdff;
+.admin-member-row {
+  border: 1px solid #dde6f3;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fcfdff;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
+}
+
+.admin-member-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-member-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .admin-member-name {
   font-weight: 700;
   color: #0f172a;
+}
+
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cfdcf5;
+  background: #eef4ff;
+  color: #1c4d98;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.admin-member-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-inline-form {
+  margin: 0;
+}
+
+.admin-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfdcf5;
+  background: #f3f7ff;
+  color: #17458a;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-mini-btn-primary {
+  border-color: #2a6be2;
+  background: linear-gradient(135deg, #1f66e5 0%, #0b5bd3 100%);
+  color: #ffffff;
+}
+
+.admin-mini-btn-danger {
+  border-color: #f1cccc;
+  background: #fff4f4;
+  color: #9f2424;
 }
 
 .profile-bio {
@@ -1084,5 +1246,14 @@ select:focus {
 
   .admin-team-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-member-row {
+    flex-wrap: wrap;
+  }
+
+  .admin-member-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

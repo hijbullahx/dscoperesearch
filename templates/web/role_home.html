@@ -1,0 +1,18 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<section class="hero">
+  <span class="hero-kicker">{{ page_kicker }}</span>
+  <h1 class="page-title">{{ page_title }}</h1>
+</section>
+
+<section class="card" style="max-width: 740px; margin: 0 auto; text-align: center;">
+  <p style="font-size: 1.04rem; margin: 0;">Welcome <strong>{{ member_name }}</strong></p>
+  <p class="muted" style="margin-top: 8px;">Role: {{ member_role }}</p>
+  {% if request.user.is_staff %}
+    <div style="margin-top: 14px;">
+      <a class="btn" href="/admin-panel/">Dashboard</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

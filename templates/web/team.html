@@ -15,14 +15,25 @@
   <div class="member-list">
     {% for member in core_members %}
       <div class="member">
-        <a href="/team/{{ member.id }}/">
+        <button
+          type="button"
+          class="member-open"
+          data-member-name="{{ member.name|escape }}"
+          data-member-role="{{ member.role|default:''|escape }}"
+          data-member-bio="{{ member.bio|default:''|escape }}"
+          data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}"
+          data-member-google="{{ member.google_scholar|default:''|escape }}"
+          data-member-github="{{ member.github|default:''|escape }}"
+          data-member-linkedin="{{ member.linkedin|default:''|escape }}"
+          data-member-website="{{ member.website|default:''|escape }}"
+        >
           {% if member.photo %}
             <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
           {% else %}
             <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
           {% endif %}
-        </a>
-        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+        </button>
+        <p><button type="button" class="member-name-open member-open" data-member-name="{{ member.name|escape }}" data-member-role="{{ member.role|default:''|escape }}" data-member-bio="{{ member.bio|default:''|escape }}" data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}" data-member-google="{{ member.google_scholar|default:''|escape }}" data-member-github="{{ member.github|default:''|escape }}" data-member-linkedin="{{ member.linkedin|default:''|escape }}" data-member-website="{{ member.website|default:''|escape }}">{{ member.name }}</button></p>
       </div>
     {% empty %}
       <div class="card muted">No members in this section.</div>
@@ -38,14 +49,25 @@
   <div class="member-list">
     {% for member in instructors %}
       <div class="member">
-        <a href="/team/{{ member.id }}/">
+        <button
+          type="button"
+          class="member-open"
+          data-member-name="{{ member.name|escape }}"
+          data-member-role="{{ member.role|default:''|escape }}"
+          data-member-bio="{{ member.bio|default:''|escape }}"
+          data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}"
+          data-member-google="{{ member.google_scholar|default:''|escape }}"
+          data-member-github="{{ member.github|default:''|escape }}"
+          data-member-linkedin="{{ member.linkedin|default:''|escape }}"
+          data-member-website="{{ member.website|default:''|escape }}"
+        >
           {% if member.photo %}
             <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
           {% else %}
             <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
           {% endif %}
-        </a>
-        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+        </button>
+        <p><button type="button" class="member-name-open member-open" data-member-name="{{ member.name|escape }}" data-member-role="{{ member.role|default:''|escape }}" data-member-bio="{{ member.bio|default:''|escape }}" data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}" data-member-google="{{ member.google_scholar|default:''|escape }}" data-member-github="{{ member.github|default:''|escape }}" data-member-linkedin="{{ member.linkedin|default:''|escape }}" data-member-website="{{ member.website|default:''|escape }}">{{ member.name }}</button></p>
       </div>
     {% empty %}
       <div class="card muted">No members in this section.</div>
@@ -61,18 +83,112 @@
   <div class="member-list">
     {% for member in registered_members %}
       <div class="member">
-        <a href="/team/{{ member.id }}/">
+        <button
+          type="button"
+          class="member-open"
+          data-member-name="{{ member.name|escape }}"
+          data-member-role="{{ member.role|default:''|escape }}"
+          data-member-bio="{{ member.bio|default:''|escape }}"
+          data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}"
+          data-member-google="{{ member.google_scholar|default:''|escape }}"
+          data-member-github="{{ member.github|default:''|escape }}"
+          data-member-linkedin="{{ member.linkedin|default:''|escape }}"
+          data-member-website="{{ member.website|default:''|escape }}"
+        >
           {% if member.photo %}
             <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
           {% else %}
             <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
           {% endif %}
-        </a>
-        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+        </button>
+        <p><button type="button" class="member-name-open member-open" data-member-name="{{ member.name|escape }}" data-member-role="{{ member.role|default:''|escape }}" data-member-bio="{{ member.bio|default:''|escape }}" data-member-photo="{% if member.photo %}{{ member.photo.url }}{% endif %}" data-member-google="{{ member.google_scholar|default:''|escape }}" data-member-github="{{ member.github|default:''|escape }}" data-member-linkedin="{{ member.linkedin|default:''|escape }}" data-member-website="{{ member.website|default:''|escape }}">{{ member.name }}</button></p>
       </div>
     {% empty %}
       <div class="card muted">No members in this section.</div>
     {% endfor %}
   </div>
 </section>
+
+<div id="member-public-modal" class="member-public-modal" aria-hidden="true">
+  <div class="member-public-backdrop" data-member-close></div>
+  <div class="member-public-card" role="dialog" aria-modal="true" aria-label="Member details">
+    <button type="button" class="member-public-close" data-member-close aria-label="Close details">&times;</button>
+    <div class="member-public-head">
+      <div id="memberPublicAvatarWrap"></div>
+      <div>
+        <h3 id="memberPublicName" class="member-public-name"></h3>
+        <p id="memberPublicRole" class="member-public-role"></p>
+      </div>
+    </div>
+    <p id="memberPublicBio" class="member-public-bio"></p>
+    <div id="memberPublicLinks" class="member-public-links"></div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const modal = document.getElementById('member-public-modal');
+    if (!modal) {
+      return;
+    }
+    const openers = document.querySelectorAll('.member-open');
+    const closers = modal.querySelectorAll('[data-member-close]');
+    const nameEl = document.getElementById('memberPublicName');
+    const roleEl = document.getElementById('memberPublicRole');
+    const bioEl = document.getElementById('memberPublicBio');
+    const avatarWrap = document.getElementById('memberPublicAvatarWrap');
+    const linksWrap = document.getElementById('memberPublicLinks');
+
+    const closeModal = () => {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('member-modal-open');
+    };
+
+    const addLink = (label, href) => {
+      if (!href) {
+        return;
+      }
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = label;
+      a.target = '_blank';
+      a.rel = 'noreferrer';
+      a.className = 'btn btn-ghost';
+      linksWrap.appendChild(a);
+    };
+
+    openers.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const data = btn.dataset;
+        nameEl.textContent = data.memberName || 'Member';
+        roleEl.textContent = data.memberRole || '';
+        bioEl.textContent = data.memberBio || 'No bio available.';
+        linksWrap.innerHTML = '';
+        addLink('Google Scholar', data.memberGoogle);
+        addLink('GitHub', data.memberGithub);
+        addLink('LinkedIn', data.memberLinkedin);
+        addLink('Website', data.memberWebsite);
+
+        if (data.memberPhoto) {
+          avatarWrap.innerHTML = '<img class="avatar" src="' + data.memberPhoto + '" alt="' + (data.memberName || 'Member') + '">';
+        } else {
+          const first = (data.memberName || '?').trim().charAt(0) || '?';
+          avatarWrap.innerHTML = '<span class="avatar-fallback">' + first + '</span>';
+        }
+
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('member-modal-open');
+      });
+    });
+
+    closers.forEach((el) => el.addEventListener('click', closeModal));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+  })();
+</script>
 {% endblock %}

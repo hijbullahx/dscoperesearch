@@ -144,45 +144,130 @@ def admin_login_page(request):
     return render(request, 'web/admin_login.html', {'form': form})
 
 
-def registered_member_login_page(request):
+def _normalized_role(role_value):
+    return (role_value or '').strip().lower()
+
+
+def _member_for_user(user):
+    if not user or not user.is_authenticated:
+        return None
+    return TeamMember.objects.filter(user=user).first()
+
+
+def _role_matches(member_role, allowed_roles):
+    return _normalized_role(member_role) in {_normalized_role(role) for role in allowed_roles}
+
+
+def _role_login_page(request, *, role_kicker, role_title, allowed_roles, redirect_name):
+    current_member = _member_for_user(request.user)
+    if request.user.is_authenticated and current_member and _role_matches(current_member.role, allowed_roles):
+        return redirect(redirect_name)
+
     if request.method == 'POST':
-        messages.success(request, 'Registered Member login will be enabled once credentials are configured.')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=username, password=password)
+
+        if not user:
+            messages.error(request, 'Invalid username or password.')
+        elif user.is_staff:
+            messages.error(request, 'Admin users should use Admin Login.')
+        else:
+            member = TeamMember.objects.filter(user=user).first()
+            if not member:
+                messages.error(request, 'No team profile is linked to this account yet.')
+            elif not _role_matches(member.role, allowed_roles):
+                messages.error(request, 'This account does not have access for this role login.')
+            else:
+                login(request, user)
+                return redirect(redirect_name)
+
     return render(
         request,
         'web/role_login.html',
         {
-            'role_kicker': 'Member Access',
-            'role_title': 'Sign in as Registered Member',
+            'role_kicker': role_kicker,
+            'role_title': role_title,
             'role_button': 'Log In',
         },
+    )
+
+
+def _role_home_page(request, *, allowed_roles, page_title, page_kicker):
+    member = _member_for_user(request.user)
+    if not member or not _role_matches(member.role, allowed_roles):
+        messages.error(request, 'Please sign in with the correct role account.')
+        return redirect('home')
+
+    return render(
+        request,
+        'web/role_home.html',
+        {
+            'page_title': page_title,
+            'page_kicker': page_kicker,
+            'member_name': member.name,
+            'member_role': member.role,
+        },
+    )
+
+
+def registered_member_login_page(request):
+    return _role_login_page(
+        request,
+        role_kicker='Member Access',
+        role_title='Sign in as Registered Member',
+        allowed_roles=['Student/Register Member'],
+        redirect_name='registered-member-home-page',
     )
 
 
 def instructor_login_page(request):
-    if request.method == 'POST':
-        messages.success(request, 'Instructor login will be enabled once credentials are configured.')
-    return render(
+    return _role_login_page(
         request,
-        'web/role_login.html',
-        {
-            'role_kicker': 'Instructor Access',
-            'role_title': 'Sign in as Instructor',
-            'role_button': 'Log In',
-        },
+        role_kicker='Instructor Access',
+        role_title='Sign in as Instructor',
+        allowed_roles=['Instructor'],
+        redirect_name='instructor-home-page',
     )
 
 
 def core_member_login_page(request):
-    if request.method == 'POST':
-        messages.success(request, 'Core Member login will be enabled once credentials are configured.')
-    return render(
+    return _role_login_page(
         request,
-        'web/role_login.html',
-        {
-            'role_kicker': 'Core Access',
-            'role_title': 'Sign in as Core Member',
-            'role_button': 'Log In',
-        },
+        role_kicker='Core Access',
+        role_title='Sign in as Core Member',
+        allowed_roles=['Core Member'],
+        redirect_name='core-member-home-page',
+    )
+
+
+@login_required(login_url='registered-member-login-page')
+def registered_member_home_page(request):
+    return _role_home_page(
+        request,
+        allowed_roles=['Student/Register Member'],
+        page_title='Registered Member Space',
+        page_kicker='Welcome',
+    )
+
+
+@login_required(login_url='instructor-login-page')
+def instructor_home_page(request):
+    return _role_home_page(
+        request,
+        allowed_roles=['Instructor'],
+        page_title='Instructor Space',
+        page_kicker='Welcome',
+    )
+
+
+@login_required(login_url='core-member-login-page')
+def core_member_home_page(request):
+    return _role_home_page(
+        request,
+        allowed_roles=['Core Member'],
+        page_title='Core Member Space',
+        page_kicker='Welcome',
     )
 
 
@@ -291,8 +376,12 @@ def admin_team_page(request):
                 username = edit_form.cleaned_data.get('username')
                 password = edit_form.cleaned_data.get('password')
 
-                if username:
-                    if member.user and member.user.username != username and User.objects.filter(username=username).exists():
+                if member.user:
+                    # Keep current username when edit form leaves it blank.
+                    if not username:
+                        username = member.user.username
+
+                    if username != member.user.username and User.objects.filter(username=username).exists():
                         messages.error(request, 'Username already exists.')
                         members = TeamMember.objects.order_by('name')
                         return render(
@@ -307,14 +396,15 @@ def admin_team_page(request):
                             },
                         )
 
-                    if member.user:
-                        member.user.username = username
-                        if password:
-                            member.user.set_password(password)
-                        member.user.save()
-                    else:
-                        if not password:
-                            messages.error(request, 'Password is required to create a new account.')
+                    member.user.username = username
+                    if password:
+                        member.user.set_password(password)
+                    member.user.save()
+                else:
+                    # For members without an account, only create one when both fields are provided.
+                    if username and password:
+                        if User.objects.filter(username=username).exists():
+                            messages.error(request, 'Username already exists.')
                             members = TeamMember.objects.order_by('name')
                             return render(
                                 request,
@@ -329,9 +419,20 @@ def admin_team_page(request):
                             )
                         user = User.objects.create_user(username=username, password=password)
                         updated_member.user = user
-                elif member.user and password:
-                    member.user.set_password(password)
-                    member.user.save()
+                    elif username or password:
+                        messages.error(request, 'Provide both username and password to create login credentials.')
+                        members = TeamMember.objects.order_by('name')
+                        return render(
+                            request,
+                            'web/admin_team.html',
+                            {
+                                'members': members,
+                                'add_form': add_form,
+                                'edit_form': edit_form,
+                                'show_add_form': show_add_form,
+                                'editing_member_id': editing_member_id,
+                            },
+                        )
 
                 updated_member.save()
                 messages.success(request, 'Member updated.')
