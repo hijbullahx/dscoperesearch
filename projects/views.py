@@ -229,8 +229,9 @@ def admin_team_members_manager_page(request):
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_team_page(request):
     members = TeamMember.objects.order_by('name')
-    add_form = TeamMemberAdminForm(prefix='add')
+    add_form = TeamMemberAdminForm(prefix='add', require_credentials=True)
     edit_form = None
+    show_add_form = request.GET.get('add') in {'1', 'true', 'yes'}
     editing_member_id = request.GET.get('edit')
 
     if editing_member_id:
@@ -255,24 +256,23 @@ def admin_team_page(request):
             return redirect('admin-team-page')
 
         if action == 'add':
-            add_form = TeamMemberAdminForm(request.POST, request.FILES, prefix='add')
+            show_add_form = True
+            add_form = TeamMemberAdminForm(
+                request.POST,
+                request.FILES,
+                prefix='add',
+                require_credentials=True,
+            )
             if add_form.is_valid():
                 new_member = add_form.save(commit=False)
                 username = add_form.cleaned_data.get('username')
                 password = add_form.cleaned_data.get('password')
 
-                if username:
-                    if User.objects.filter(username=username).exists():
-                        messages.error(request, 'Username already exists.')
-                    elif not password:
-                        messages.error(request, 'Password is required when username is provided.')
-                    else:
-                        user = User.objects.create_user(username=username, password=password)
-                        new_member.user = user
-                        new_member.save()
-                        messages.success(request, 'Member added.')
-                        return redirect('admin-team-page')
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, 'Username already exists.')
                 else:
+                    user = User.objects.create_user(username=username, password=password)
+                    new_member.user = user
                     new_member.save()
                     messages.success(request, 'Member added.')
                     return redirect('admin-team-page')
@@ -302,6 +302,7 @@ def admin_team_page(request):
                                 'members': members,
                                 'add_form': add_form,
                                 'edit_form': edit_form,
+                                'show_add_form': show_add_form,
                                 'editing_member_id': editing_member_id,
                             },
                         )
@@ -322,6 +323,7 @@ def admin_team_page(request):
                                     'members': members,
                                     'add_form': add_form,
                                     'edit_form': edit_form,
+                                    'show_add_form': show_add_form,
                                     'editing_member_id': editing_member_id,
                                 },
                             )
@@ -343,6 +345,7 @@ def admin_team_page(request):
             'members': members,
             'add_form': add_form,
             'edit_form': edit_form,
+            'show_add_form': show_add_form,
             'editing_member_id': editing_member_id,
         },
     )
