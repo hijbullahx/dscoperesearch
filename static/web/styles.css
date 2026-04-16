@@ -21,6 +21,38 @@ body {
   color: var(--text);
   line-height: 1.6;
   text-rendering: optimizeLegibility;
+  position: relative;
+  min-height: 100vh;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background:
+    radial-gradient(560px 320px at 8% 8%, rgba(37, 99, 235, 0.11), transparent 65%),
+    radial-gradient(520px 300px at 92% 12%, rgba(14, 165, 233, 0.1), transparent 64%),
+    radial-gradient(720px 360px at 50% 100%, rgba(99, 102, 241, 0.08), transparent 70%);
+}
+
+body::after {
+  background-image: linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.32), transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.32), transparent 78%);
+}
+
+.nav,
+.container {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
