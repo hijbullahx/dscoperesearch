@@ -26,7 +26,7 @@
             aria-controls="signup-menu"
             aria-expanded="false"
           >
-            Sign Up
+            Sign In
           </button>
           {% if request.user.is_authenticated and request.user.is_staff %}
             <form method="post" action="/admin-panel/logout/" class="nav-logout-form">

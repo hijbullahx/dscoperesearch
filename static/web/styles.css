@@ -407,7 +407,10 @@ body::after {
 }
 
 .admin-grid {
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
 }
 
 .admin-tile {
@@ -416,6 +419,12 @@ body::after {
   position: relative;
   overflow: hidden;
   padding-top: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: min(100%, 290px);
+  min-height: 205px;
 }
 
 .admin-tile::before {
@@ -430,17 +439,39 @@ body::after {
 }
 
 .admin-tile h3 {
+  margin-top: 0;
   margin-bottom: 8px;
 }
 
-.tile-meta {
-  margin-top: 12px;
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #1d4e89;
+.admin-tile-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.admin-tile-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #d7e4f8;
+  background: #f1f6ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-tile:hover .admin-tile-icon {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 8px 14px rgba(37, 99, 235, 0.18);
+}
+
+.admin-tile .muted {
+  margin-top: 2px;
 }
 
 a.btn,
