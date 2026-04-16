@@ -5,6 +5,11 @@
   <span class="hero-kicker">Work Portfolio</span>
   <h1 class="page-title">Projects</h1>
   <p class="hero-subtitle">Explore active and completed research efforts from DeepScope members, including engineering prototypes and open-source outcomes.</p>
+  <div class="hero-stats">
+    <span class="hero-stat"><strong>{{ projects|length }}</strong> projects</span>
+    <span class="hero-stat">Research archive</span>
+    <span class="hero-stat">GitHub-linked work</span>
+  </div>
 </section>
 <div class="grid">
   {% for project in projects %}
