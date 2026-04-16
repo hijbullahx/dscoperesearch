@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import status, viewsets
@@ -9,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import AdminLoginForm, TeamMemberAdminForm
+from .forms import AdminLoginForm, PendingRegistrationForm, TeamMemberAdminForm
 from .models import PendingRegistration, Project, TeamMember
 from .serializers import PendingRegistrationSerializer, TeamMemberSerializer
 
@@ -57,10 +58,20 @@ class PendingRegistrationViewSet(viewsets.ModelViewSet):
     def approve(self, request, pk=None):
         registration = self.get_object()
 
-        # Create a new user
-        username = registration.email.split('@')[0]
-        password = User.objects.make_random_password()
-        user = User.objects.create_user(username=username, email=registration.email, password=password)
+        if not registration.username or not registration.password_hash:
+            return Response(
+                {'status': 'missing credentials in request record'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if User.objects.filter(username=registration.username).exists():
+            return Response(
+                {'status': 'username already exists'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = User(username=registration.username, email=registration.email)
+        user.password = registration.password_hash
         user.save()
 
         # Create a new team member
@@ -68,13 +79,14 @@ class PendingRegistrationViewSet(viewsets.ModelViewSet):
             user=user,
             name=registration.name,
             role=registration.requested_role,
+            position=999,
             bio=registration.bio
         )
         
         # Delete the pending registration
         registration.delete()
 
-        return Response({'status': 'registration approved', 'username': username, 'password': password}, status=status.HTTP_200_OK)
+        return Response({'status': 'registration approved', 'username': registration.username}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def decline(self, request, pk=None):
@@ -158,29 +170,53 @@ def _role_matches(member_role, allowed_roles):
     return _normalized_role(member_role) in {_normalized_role(role) for role in allowed_roles}
 
 
-def _role_login_page(request, *, role_kicker, role_title, allowed_roles, redirect_name):
+def _role_login_page(
+    request,
+    *,
+    role_kicker,
+    role_title,
+    allowed_roles,
+    redirect_name,
+    allow_registration=False,
+):
     current_member = _member_for_user(request.user)
     if request.user.is_authenticated and current_member and _role_matches(current_member.role, allowed_roles):
         return redirect(redirect_name)
 
-    if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '')
-        user = authenticate(request, username=username, password=password)
+    registration_form = PendingRegistrationForm()
+    show_registration_modal = request.GET.get('register') in {'1', 'true', 'yes'}
 
-        if not user:
-            messages.error(request, 'Invalid username or password.')
-        elif user.is_staff:
-            messages.error(request, 'Admin users should use Admin Login.')
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if allow_registration and action == 'register':
+            show_registration_modal = True
+            registration_form = PendingRegistrationForm(request.POST, request.FILES)
+            if registration_form.is_valid():
+                pending = registration_form.save(commit=False)
+                pending.requested_role = 'Student/Register Member'
+                pending.password_hash = make_password(registration_form.cleaned_data['password'])
+                pending.save()
+                messages.success(request, 'Registration request submitted. Admin will review it shortly.')
+                return redirect('registered-member-login-page')
         else:
-            member = TeamMember.objects.filter(user=user).first()
-            if not member:
-                messages.error(request, 'No team profile is linked to this account yet.')
-            elif not _role_matches(member.role, allowed_roles):
-                messages.error(request, 'This account does not have access for this role login.')
+            username = request.POST.get('username', '').strip()
+            password = request.POST.get('password', '')
+            user = authenticate(request, username=username, password=password)
+
+            if not user:
+                messages.error(request, 'Invalid username or password.')
+            elif user.is_staff:
+                messages.error(request, 'Admin users should use Admin Login.')
             else:
-                login(request, user)
-                return redirect(redirect_name)
+                member = TeamMember.objects.filter(user=user).first()
+                if not member:
+                    messages.error(request, 'No team profile is linked to this account yet.')
+                elif not _role_matches(member.role, allowed_roles):
+                    messages.error(request, 'This account does not have access for this role login.')
+                else:
+                    login(request, user)
+                    return redirect(redirect_name)
 
     return render(
         request,
@@ -189,6 +225,9 @@ def _role_login_page(request, *, role_kicker, role_title, allowed_roles, redirec
             'role_kicker': role_kicker,
             'role_title': role_title,
             'role_button': 'Log In',
+            'allow_registration': allow_registration,
+            'registration_form': registration_form,
+            'show_registration_modal': show_registration_modal,
         },
     )
 
@@ -218,6 +257,7 @@ def registered_member_login_page(request):
         role_title='Sign in as Registered Member',
         allowed_roles=['Student/Register Member'],
         redirect_name='registered-member-home-page',
+        allow_registration=True,
     )
 
 
@@ -342,11 +382,18 @@ def admin_team_members_manager_page(request):
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_team_page(request):
-    members = TeamMember.objects.order_by('name')
+    members = TeamMember.objects.order_by('role', 'position', 'name')
+    pending_requests = PendingRegistration.objects.order_by('-created_at')
     add_form = TeamMemberAdminForm(prefix='add', require_credentials=True)
     edit_form = None
     show_add_form = request.GET.get('add') in {'1', 'true', 'yes'}
+    show_requests_panel = request.GET.get('requests') in {'1', 'true', 'yes'}
+    selected_request_id = request.GET.get('request')
+    selected_request = None
     editing_member_id = request.GET.get('edit')
+
+    if selected_request_id:
+        selected_request = PendingRegistration.objects.filter(id=selected_request_id).first()
 
     if editing_member_id:
         editing_member = TeamMember.objects.filter(id=editing_member_id).first()
@@ -368,6 +415,55 @@ def admin_team_page(request):
             else:
                 messages.error(request, 'Member not found.')
             return redirect('admin-team-page')
+
+        if action == 'approve-request':
+            request_id = request.POST.get('request_id')
+            pending = PendingRegistration.objects.filter(id=request_id).first()
+            if not pending:
+                messages.error(request, 'Request not found.')
+                return redirect('/admin-panel/team/?requests=1')
+
+            if User.objects.filter(username=pending.username).exists():
+                messages.error(request, 'Cannot approve: username already exists. Edit request or delete it.')
+                return redirect(f'/admin-panel/team/?requests=1&request={pending.id}')
+
+            user = User(username=pending.username, email=pending.email)
+            user.password = pending.password_hash
+            user.save()
+
+            next_position = (
+                TeamMember.objects.filter(role='Student/Register Member')
+                .order_by('-position')
+                .values_list('position', flat=True)
+                .first()
+            )
+            next_position = (next_position or 0) + 1
+
+            TeamMember.objects.create(
+                user=user,
+                name=pending.name,
+                role='Student/Register Member',
+                position=next_position,
+                bio=pending.bio,
+                photo=pending.photo,
+                google_scholar=pending.google_scholar,
+                github=pending.github,
+                linkedin=pending.linkedin,
+                website=pending.website,
+            )
+            pending.delete()
+            messages.success(request, 'Request accepted and member added.')
+            return redirect('/admin-panel/team/?requests=1')
+
+        if action == 'delete-request':
+            request_id = request.POST.get('request_id')
+            pending = PendingRegistration.objects.filter(id=request_id).first()
+            if pending:
+                pending.delete()
+                messages.success(request, 'Request deleted.')
+            else:
+                messages.error(request, 'Request not found.')
+            return redirect('/admin-panel/team/?requests=1')
 
         if action == 'add':
             show_add_form = True
@@ -412,7 +508,7 @@ def admin_team_page(request):
 
                     if username != member.user.username and User.objects.filter(username=username).exists():
                         messages.error(request, 'Username already exists.')
-                        members = TeamMember.objects.order_by('name')
+                        members = TeamMember.objects.order_by('role', 'position', 'name')
                         return render(
                             request,
                             'web/admin_team.html',
@@ -422,6 +518,10 @@ def admin_team_page(request):
                                 'edit_form': edit_form,
                                 'show_add_form': show_add_form,
                                 'editing_member_id': editing_member_id,
+                                'pending_requests': pending_requests,
+                                'pending_requests_count': pending_requests.count(),
+                                'show_requests_panel': show_requests_panel,
+                                'selected_request': selected_request,
                             },
                         )
 
@@ -434,7 +534,7 @@ def admin_team_page(request):
                     if username and password:
                         if User.objects.filter(username=username).exists():
                             messages.error(request, 'Username already exists.')
-                            members = TeamMember.objects.order_by('name')
+                            members = TeamMember.objects.order_by('role', 'position', 'name')
                             return render(
                                 request,
                                 'web/admin_team.html',
@@ -444,13 +544,17 @@ def admin_team_page(request):
                                     'edit_form': edit_form,
                                     'show_add_form': show_add_form,
                                     'editing_member_id': editing_member_id,
+                                    'pending_requests': pending_requests,
+                                    'pending_requests_count': pending_requests.count(),
+                                    'show_requests_panel': show_requests_panel,
+                                    'selected_request': selected_request,
                                 },
                             )
                         user = User.objects.create_user(username=username, password=password)
                         updated_member.user = user
                     elif username or password:
                         messages.error(request, 'Provide both username and password to create login credentials.')
-                        members = TeamMember.objects.order_by('name')
+                        members = TeamMember.objects.order_by('role', 'position', 'name')
                         return render(
                             request,
                             'web/admin_team.html',
@@ -460,6 +564,10 @@ def admin_team_page(request):
                                 'edit_form': edit_form,
                                 'show_add_form': show_add_form,
                                 'editing_member_id': editing_member_id,
+                                'pending_requests': pending_requests,
+                                'pending_requests_count': pending_requests.count(),
+                                'show_requests_panel': show_requests_panel,
+                                'selected_request': selected_request,
                             },
                         )
 
@@ -467,7 +575,8 @@ def admin_team_page(request):
                 messages.success(request, 'Member updated.')
                 return redirect('admin-team-page')
 
-    members = TeamMember.objects.order_by('name')
+    members = TeamMember.objects.order_by('role', 'position', 'name')
+    pending_requests = PendingRegistration.objects.order_by('-created_at')
     return render(
         request,
         'web/admin_team.html',
@@ -477,5 +586,9 @@ def admin_team_page(request):
             'edit_form': edit_form,
             'show_add_form': show_add_form,
             'editing_member_id': editing_member_id,
+            'pending_requests': pending_requests,
+            'pending_requests_count': pending_requests.count(),
+            'show_requests_panel': show_requests_panel,
+            'selected_request': selected_request,
         },
     )

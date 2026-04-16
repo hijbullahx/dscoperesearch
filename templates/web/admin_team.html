@@ -12,6 +12,10 @@
   {% else %}
     <a class="btn" href="/admin-panel/team/?add=1">Add Member</a>
   {% endif %}
+  <a class="btn btn-ghost admin-request-btn" href="/admin-panel/team/?requests=1">
+    Requests
+    <span class="admin-request-count">{{ pending_requests_count }}</span>
+  </a>
 </section>
 
 {% if show_add_form %}
@@ -78,6 +82,72 @@
           <a class="btn btn-ghost" href="/admin-panel/team/">Cancel</a>
         </div>
       </form>
+    </div>
+  </section>
+{% endif %}
+
+{% if show_requests_panel %}
+  <div class="modal-backdrop"></div>
+  <section class="modal-shell" role="dialog" aria-modal="true" aria-label="Registration Requests">
+    <div class="card admin-team-card modal-card admin-requests-card">
+      <div class="modal-head">
+        <h3>Registration Requests</h3>
+        <a class="btn btn-ghost" href="/admin-panel/team/">Close</a>
+      </div>
+
+      <div class="admin-requests-grid">
+        <section>
+          <p class="muted" style="margin-top: 0;">Click a name to view full details.</p>
+          <div class="admin-request-list">
+            {% for req in pending_requests %}
+              <a class="admin-request-item {% if selected_request and selected_request.id == req.id %}is-active{% endif %}" href="/admin-panel/team/?requests=1&request={{ req.id }}">
+                <span class="admin-request-name">{{ req.name }}</span>
+                <span class="admin-request-date">{{ req.created_at|date:'M d, Y' }}</span>
+              </a>
+            {% empty %}
+              <div class="card muted">No pending requests.</div>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="admin-request-detail">
+          {% if selected_request %}
+            <h4 style="margin-top: 0; margin-bottom: 10px;">Request Details</h4>
+            {% if selected_request.photo %}
+              <p style="margin-bottom: 10px;"><img class="avatar-sm" src="{{ selected_request.photo.url }}" alt="{{ selected_request.name }}"></p>
+            {% endif %}
+            <p><strong>Name:</strong> {{ selected_request.name }}</p>
+            <p><strong>Email:</strong> {{ selected_request.email }}</p>
+            <p><strong>Institution:</strong> {{ selected_request.institution_name|default:'-' }}</p>
+            <p><strong>Role:</strong> {{ selected_request.requested_role }}</p>
+            <p><strong>Username:</strong> {{ selected_request.username }}</p>
+            <p><strong>Payment Ref/Txn ID:</strong> {{ selected_request.payment_reference|default:'-' }}</p>
+            <p><strong>Bio:</strong> {{ selected_request.bio|default:'-' }}</p>
+            <p><strong>Google Scholar:</strong> {{ selected_request.google_scholar|default:'-' }}</p>
+            <p><strong>GitHub:</strong> {{ selected_request.github|default:'-' }}</p>
+            <p><strong>LinkedIn:</strong> {{ selected_request.linkedin|default:'-' }}</p>
+            <p><strong>Website:</strong> {{ selected_request.website|default:'-' }}</p>
+            <p><strong>Submitted:</strong> {{ selected_request.created_at|date:'M d, Y, h:i A' }}</p>
+
+            <div class="admin-member-actions" style="margin-top: 12px;">
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="approve-request">
+                <input type="hidden" name="request_id" value="{{ selected_request.id }}">
+                <button class="admin-mini-btn admin-mini-btn-primary" type="submit">Accept</button>
+              </form>
+              <form method="post" onsubmit="return confirm('Delete this request?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete-request">
+                <input type="hidden" name="request_id" value="{{ selected_request.id }}">
+                <button class="admin-mini-btn admin-mini-btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          {% else %}
+            <p class="muted" style="margin: 0;">Select a request to view details.</p>
+          {% endif %}
+        </section>
+      </div>
     </div>
   </section>
 {% endif %}

@@ -1,5 +1,6 @@
 from django import forms
-from .models import TeamMember
+from django.contrib.auth.models import User
+from .models import PendingRegistration, TeamMember
 
 
 class AdminLoginForm(forms.Form):
@@ -65,3 +66,39 @@ class TeamMemberAdminForm(forms.ModelForm):
                 self.add_error('position', f'Position {position} is already assigned to another member in the {role} role.')
         
         return cleaned_data
+
+
+class PendingRegistrationForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    class Meta:
+        model = PendingRegistration
+        fields = [
+            'name',
+            'email',
+            'institution_name',
+            'bio',
+            'payment_reference',
+            'photo',
+            'google_scholar',
+            'github',
+            'linkedin',
+            'website',
+            'username',
+            'password',
+        ]
+
+    def clean_username(self):
+        username = (self.cleaned_data.get('username') or '').strip()
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError('This username is already in use.')
+        if PendingRegistration.objects.filter(username=username).exists():
+            raise forms.ValidationError('A request with this username already exists.')
+        return username
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if PendingRegistration.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('A request with this email already exists.')
+        return email

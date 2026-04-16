@@ -9,6 +9,7 @@
 
   <form method="post" class="form-panel auth-card">
     {% csrf_token %}
+    <input type="hidden" name="action" value="login">
     <div class="form-row">
       <label for="role_username">Username</label>
       <input id="role_username" name="username" type="text" autocomplete="username" required>
@@ -18,6 +19,93 @@
       <input id="role_password" name="password" type="password" autocomplete="current-password" required>
     </div>
     <button class="btn auth-submit" type="submit">{{ role_button }}</button>
+
+    {% if allow_registration %}
+      <p class="muted" style="margin-top: 12px; margin-bottom: 0; text-align: center;">
+        Not registered?
+        <button type="button" class="member-name-open" data-register-open>Click here to register</button>
+      </p>
+    {% endif %}
   </form>
 </section>
+
+{% if allow_registration %}
+  <div class="member-public-modal{% if show_registration_modal or registration_form.errors %} is-open{% endif %}" id="member-register-modal" aria-hidden="{% if show_registration_modal or registration_form.errors %}false{% else %}true{% endif %}">
+    <div class="member-public-backdrop" data-register-close></div>
+    <section class="member-public-card" role="dialog" aria-modal="true" aria-label="Registration Request">
+      <div class="member-public-body" style="padding-top: 0;">
+        <div class="modal-head" style="margin-bottom: 10px;">
+          <h3 style="margin: 0;">Registration Request</h3>
+          <button type="button" class="btn btn-ghost" data-register-close>Close</button>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="admin-team-form-grid">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="register">
+
+          {% if registration_form.non_field_errors %}
+            <div class="admin-team-wide alert alert-error">{{ registration_form.non_field_errors }}</div>
+          {% endif %}
+
+          <div class="form-row"><label>Name *</label>{{ registration_form.name }}{{ registration_form.name.errors }}</div>
+          <div class="form-row"><label>Email *</label>{{ registration_form.email }}{{ registration_form.email.errors }}</div>
+          <div class="form-row"><label>Institution Name</label>{{ registration_form.institution_name }}{{ registration_form.institution_name.errors }}</div>
+          <div class="form-row"><label>Payment Ref/Txn ID</label>{{ registration_form.payment_reference }}{{ registration_form.payment_reference.errors }}</div>
+          <div class="form-row admin-team-wide"><label>Bio</label>{{ registration_form.bio }}{{ registration_form.bio.errors }}</div>
+          <div class="form-row"><label>Photo</label>{{ registration_form.photo }}{{ registration_form.photo.errors }}</div>
+          <div class="form-row"><label>Google Scholar</label>{{ registration_form.google_scholar }}{{ registration_form.google_scholar.errors }}</div>
+          <div class="form-row"><label>GitHub</label>{{ registration_form.github }}{{ registration_form.github.errors }}</div>
+          <div class="form-row"><label>LinkedIn</label>{{ registration_form.linkedin }}{{ registration_form.linkedin.errors }}</div>
+          <div class="form-row"><label>Website</label>{{ registration_form.website }}{{ registration_form.website.errors }}</div>
+          <div class="form-row"><label>Username *</label>{{ registration_form.username }}{{ registration_form.username.errors }}</div>
+          <div class="form-row"><label>Password *</label>{{ registration_form.password }}{{ registration_form.password.errors }}</div>
+
+          <div class="admin-team-actions">
+            <button class="btn btn-ghost" type="button" data-payment-open>Make Payment</button>
+            <button class="btn" type="submit">Submit Request</button>
+            <button type="button" class="btn btn-ghost" data-register-close>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById('member-register-modal');
+      if (!modal) {
+        return;
+      }
+
+      const openers = document.querySelectorAll('[data-register-open]');
+      const closers = document.querySelectorAll('[data-register-close]');
+
+      const setOpen = (isOpen) => {
+        modal.classList.toggle('is-open', isOpen);
+        modal.setAttribute('aria-hidden', String(!isOpen));
+      };
+
+      openers.forEach((button) => {
+        button.addEventListener('click', () => setOpen(true));
+      });
+
+      closers.forEach((button) => {
+        button.addEventListener('click', () => setOpen(false));
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+          setOpen(false);
+        }
+      });
+
+      const paymentButtons = document.querySelectorAll('[data-payment-open]');
+      paymentButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          window.alert('Payment integration will be added here soon.');
+        });
+      });
+    })();
+  </script>
+{% endif %}
 {% endblock %}
