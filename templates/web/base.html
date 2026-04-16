@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DeepScope Research</title>
+    <link rel="stylesheet" href="{% static 'web/styles.css' %}">
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-inner">
+        <div class="brand">DeepScope Research</div>
+        <div class="nav-links">
+          <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+          <a href="/projects/" class="{% if request.path == '/projects/' %}active{% endif %}">Projects</a>
+          <a href="/publications/" class="{% if request.path == '/publications/' %}active{% endif %}">Publications</a>
+          <a href="/team/" class="{% if request.path == '/team/' %}active{% endif %}">Team</a>
+          {% if request.user.is_authenticated and request.user.is_staff %}
+            <a href="/admin-panel/" class="{% if '/admin-panel/' in request.path %}active{% endif %}">Admin Panel</a>
+            <form method="post" action="/admin-panel/logout/" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-danger" type="submit">Logout</button>
+            </form>
+          {% else %}
+            <a href="/admin-panel/login/" class="{% if request.path == '/admin-panel/login/' %}active{% endif %}">Admin Login</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

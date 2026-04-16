@@ -1,0 +1,59 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Team</h1>
+
+<h2 class="section-title">Core Members</h2>
+<div class="member-list">
+  {% for member in core_members %}
+    <div class="member">
+      <a href="/team/{{ member.id }}/">
+        {% if member.photo %}
+          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+        {% else %}
+          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+        {% endif %}
+      </a>
+      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+    </div>
+  {% empty %}
+    <div class="card muted">No members in this section.</div>
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Instructors</h2>
+<div class="member-list">
+  {% for member in instructors %}
+    <div class="member">
+      <a href="/team/{{ member.id }}/">
+        {% if member.photo %}
+          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+        {% else %}
+          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+        {% endif %}
+      </a>
+      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+    </div>
+  {% empty %}
+    <div class="card muted">No members in this section.</div>
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Registered Members</h2>
+<div class="member-list">
+  {% for member in registered_members %}
+    <div class="member">
+      <a href="/team/{{ member.id }}/">
+        {% if member.photo %}
+          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+        {% else %}
+          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+        {% endif %}
+      </a>
+      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+    </div>
+  {% empty %}
+    <div class="card muted">No members in this section.</div>
+  {% endfor %}
+</div>
+{% endblock %}

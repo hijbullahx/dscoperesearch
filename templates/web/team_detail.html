@@ -1,0 +1,40 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<div class="row" style="margin-bottom: 14px;">
+  <a class="btn btn-ghost" href="/team/">Back to Team</a>
+</div>
+
+<div class="card">
+  <div class="row">
+    {% if member.photo %}
+      <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+    {% else %}
+      <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+    {% endif %}
+    <div>
+      <h1 style="margin: 0;">{{ member.name }}</h1>
+      <p class="muted" style="margin-top: 6px;">{{ member.role }}</p>
+    </div>
+  </div>
+
+  {% if member.bio %}
+    <p style="margin-top: 16px;">{{ member.bio }}</p>
+  {% endif %}
+
+  <div class="row" style="margin-top: 12px;">
+    {% if member.google_scholar %}
+      <a class="btn btn-ghost" href="{{ member.google_scholar }}" target="_blank" rel="noreferrer">Google Scholar</a>
+    {% endif %}
+    {% if member.github %}
+      <a class="btn btn-ghost" href="{{ member.github }}" target="_blank" rel="noreferrer">GitHub</a>
+    {% endif %}
+    {% if member.linkedin %}
+      <a class="btn btn-ghost" href="{{ member.linkedin }}" target="_blank" rel="noreferrer">LinkedIn</a>
+    {% endif %}
+    {% if member.website %}
+      <a class="btn btn-ghost" href="{{ member.website }}" target="_blank" rel="noreferrer">Website</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

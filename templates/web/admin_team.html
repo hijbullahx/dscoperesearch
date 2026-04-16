@@ -1,0 +1,104 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Manage Team</h1>
+
+<div class="split">
+  <div class="card">
+    <h3>Add Member</h3>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add">
+
+      <div class="form-row"><label>Name</label>{{ add_form.name }}</div>
+      <div class="form-row"><label>Role</label>{{ add_form.role }}</div>
+      <div class="form-row"><label>Bio</label>{{ add_form.bio }}</div>
+      <div class="form-row"><label>Photo</label>{{ add_form.photo }}</div>
+      <div class="form-row"><label>Google Scholar</label>{{ add_form.google_scholar }}</div>
+      <div class="form-row"><label>GitHub</label>{{ add_form.github }}</div>
+      <div class="form-row"><label>LinkedIn</label>{{ add_form.linkedin }}</div>
+      <div class="form-row"><label>Website</label>{{ add_form.website }}</div>
+      <div class="form-row"><label>Username (optional)</label>{{ add_form.username }}</div>
+      <div class="form-row"><label>Password (required if username is set)</label>{{ add_form.password }}</div>
+
+      <button class="btn" type="submit">Add Member</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>Edit Member</h3>
+    {% if edit_form %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit">
+        <input type="hidden" name="member_id" value="{{ editing_member_id }}">
+
+        <div class="form-row"><label>Name</label>{{ edit_form.name }}</div>
+        <div class="form-row"><label>Role</label>{{ edit_form.role }}</div>
+        <div class="form-row"><label>Bio</label>{{ edit_form.bio }}</div>
+        <div class="form-row"><label>Photo</label>{{ edit_form.photo }}</div>
+        <div class="form-row"><label>Google Scholar</label>{{ edit_form.google_scholar }}</div>
+        <div class="form-row"><label>GitHub</label>{{ edit_form.github }}</div>
+        <div class="form-row"><label>LinkedIn</label>{{ edit_form.linkedin }}</div>
+        <div class="form-row"><label>Website</label>{{ edit_form.website }}</div>
+        <div class="form-row"><label>Username (optional)</label>{{ edit_form.username }}</div>
+        <div class="form-row"><label>Password (optional, changes existing if filled)</label>{{ edit_form.password }}</div>
+
+        <div class="row">
+          <button class="btn" type="submit">Save Changes</button>
+          <a class="btn btn-ghost" href="/admin-panel/team/">Cancel</a>
+        </div>
+      </form>
+    {% else %}
+      <p class="muted">Choose a member from the table below to edit.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3>Current Members</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Member</th>
+        <th>Role</th>
+        <th>Bio</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in members %}
+        <tr>
+          <td>
+            <div class="row">
+              {% if member.photo %}
+                <img class="avatar-sm" src="{{ member.photo.url }}" alt="{{ member.name }}">
+              {% else %}
+                <span class="avatar-fallback-sm">{{ member.name|slice:':1' }}</span>
+              {% endif %}
+              <span>{{ member.name }}</span>
+            </div>
+          </td>
+          <td>{{ member.role }}</td>
+          <td class="muted">{{ member.bio|default:'-' }}</td>
+          <td>
+            <div class="row">
+              <a class="btn btn-ghost" href="/admin-panel/team/?edit={{ member.id }}">Edit</a>
+              <form method="post" onsubmit="return confirm('Remove this member?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="member_id" value="{{ member.id }}">
+                <button class="btn btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" class="muted">No team members found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

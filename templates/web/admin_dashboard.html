@@ -1,0 +1,12 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Admin Dashboard</h1>
+<div class="grid">
+  <a class="card" href="/admin-panel/team/"><h3>Manage Team</h3><p class="muted">Add, edit, and remove members.</p></a>
+  <a class="card" href="/admin-panel/home/"><h3>Home Page Manager</h3><p class="muted">Content controls placeholder.</p></a>
+  <a class="card" href="/admin-panel/projects/"><h3>Project Manager</h3><p class="muted">Project controls placeholder.</p></a>
+  <a class="card" href="/admin-panel/publications/"><h3>Publication Manager</h3><p class="muted">Publication controls placeholder.</p></a>
+  <a class="card" href="/admin-panel/team-members/"><h3>Team Member Manager</h3><p class="muted">Additional member tools placeholder.</p></a>
+</div>
+{% endblock %}

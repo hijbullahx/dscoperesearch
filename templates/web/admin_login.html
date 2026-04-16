@@ -1,0 +1,17 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Admin Login</h1>
+<form method="post" class="form-panel">
+  {% csrf_token %}
+  <div class="form-row">
+    <label for="id_username">Username</label>
+    {{ form.username }}
+  </div>
+  <div class="form-row">
+    <label for="id_password">Password</label>
+    {{ form.password }}
+  </div>
+  <button class="btn" type="submit">Login</button>
+</form>
+{% endblock %}
