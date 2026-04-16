@@ -271,6 +271,35 @@ def core_member_home_page(request):
     )
 
 
+@login_required(login_url='home')
+def member_dashboard_page(request):
+    """Smart redirect to appropriate dashboard based on user role."""
+    if request.user.is_staff:
+        return redirect('admin-dashboard-page')
+    
+    member = _member_for_user(request.user)
+    if not member:
+        return redirect('home')
+    
+    role_lower = _normalized_role(member.role)
+    
+    if 'core' in role_lower:
+        return redirect('core-member-home-page')
+    elif 'instructor' in role_lower:
+        return redirect('instructor-home-page')
+    else:
+        return redirect('registered-member-home-page')
+
+
+@login_required(login_url='home')
+def member_logout_page(request):
+    """Logout page for role-based members."""
+    if request.method == 'POST':
+        logout(request)
+        return redirect('home')
+    return redirect('member-dashboard-page')
+
+
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_logout_page(request):
