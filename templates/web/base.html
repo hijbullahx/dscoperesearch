@@ -38,28 +38,20 @@
           <div id="signup-menu" class="signup-menu" aria-hidden="true">
             <div class="signup-menu-panel">
               <div class="signup-menu-head">
-                <span class="hero-kicker">Join</span>
+                <span class="signup-menu-label">Sign</span>
                 <button type="button" class="menu-close" data-signup-close aria-label="Close sign up menu">&times;</button>
               </div>
-              <a class="signup-menu-item" href="/team/">
-                <strong>As Registered Member</strong>
-                <span>View the public team directory.</span>
-              </a>
-              <a class="signup-menu-item" href="/team/">
-                <strong>As Instructor</strong>
-                <span>Explore the research group structure.</span>
-              </a>
-              <a class="signup-menu-item" href="/team/">
-                <strong>As Core Member</strong>
-                <span>Open the core member team view.</span>
-              </a>
-              <a
-                class="signup-menu-item signup-menu-admin"
-                href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
-              >
-                <strong>As Admin</strong>
-                <span>Open the admin dashboard.</span>
-              </a>
+              <div class="signup-menu-list">
+                <a class="signup-menu-item" href="/team/">As Registered Member</a>
+                <a class="signup-menu-item" href="/team/">As Instructor</a>
+                <a class="signup-menu-item" href="/team/">As Core Member</a>
+                <a
+                  class="signup-menu-item signup-menu-admin"
+                  href="{% if request.user.is_authenticated and request.user.is_staff %}/admin-panel/{% else %}/admin-panel/login/{% endif %}"
+                >
+                  As Admin
+                </a>
+              </div>
             </div>
           </div>
         </div>
