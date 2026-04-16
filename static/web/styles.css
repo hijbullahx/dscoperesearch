@@ -370,6 +370,41 @@ button.btn-danger {
   letter-spacing: -0.02em;
 }
 
+.section-panel {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #d5e1f2;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 251, 255, 0.92) 100%);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.section-panel .section-title {
+  margin: 0;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #e8f1ff;
+  border: 1px solid #c8daf7;
+  color: #1c4d98;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .member p {
   margin: 12px 0 4px;
 }

@@ -7,57 +7,72 @@
   <p class="hero-subtitle">Meet the core members, instructors, and registered collaborators building DeepScope Research.</p>
 </section>
 
-<h2 class="section-title">Core Members</h2>
-<div class="member-list">
-  {% for member in core_members %}
-    <div class="member">
-      <a href="/team/{{ member.id }}/">
-        {% if member.photo %}
-          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
-        {% else %}
-          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
-        {% endif %}
-      </a>
-      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
-    </div>
-  {% empty %}
-    <div class="card muted">No members in this section.</div>
-  {% endfor %}
-</div>
+<section class="section-panel">
+  <div class="section-head">
+    <h2 class="section-title">Core Members</h2>
+    <span class="section-badge">{{ core_members|length }}</span>
+  </div>
+  <div class="member-list">
+    {% for member in core_members %}
+      <div class="member">
+        <a href="/team/{{ member.id }}/">
+          {% if member.photo %}
+            <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+          {% else %}
+            <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+          {% endif %}
+        </a>
+        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+      </div>
+    {% empty %}
+      <div class="card muted">No members in this section.</div>
+    {% endfor %}
+  </div>
+</section>
 
-<h2 class="section-title">Instructors</h2>
-<div class="member-list">
-  {% for member in instructors %}
-    <div class="member">
-      <a href="/team/{{ member.id }}/">
-        {% if member.photo %}
-          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
-        {% else %}
-          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
-        {% endif %}
-      </a>
-      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
-    </div>
-  {% empty %}
-    <div class="card muted">No members in this section.</div>
-  {% endfor %}
-</div>
+<section class="section-panel">
+  <div class="section-head">
+    <h2 class="section-title">Instructors</h2>
+    <span class="section-badge">{{ instructors|length }}</span>
+  </div>
+  <div class="member-list">
+    {% for member in instructors %}
+      <div class="member">
+        <a href="/team/{{ member.id }}/">
+          {% if member.photo %}
+            <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+          {% else %}
+            <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+          {% endif %}
+        </a>
+        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+      </div>
+    {% empty %}
+      <div class="card muted">No members in this section.</div>
+    {% endfor %}
+  </div>
+</section>
 
-<h2 class="section-title">Registered Members</h2>
-<div class="member-list">
-  {% for member in registered_members %}
-    <div class="member">
-      <a href="/team/{{ member.id }}/">
-        {% if member.photo %}
-          <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
-        {% else %}
-          <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
-        {% endif %}
-      </a>
-      <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
-    </div>
-  {% empty %}
-    <div class="card muted">No members in this section.</div>
-  {% endfor %}
-</div>
+<section class="section-panel">
+  <div class="section-head">
+    <h2 class="section-title">Registered Members</h2>
+    <span class="section-badge">{{ registered_members|length }}</span>
+  </div>
+  <div class="member-list">
+    {% for member in registered_members %}
+      <div class="member">
+        <a href="/team/{{ member.id }}/">
+          {% if member.photo %}
+            <img class="avatar" src="{{ member.photo.url }}" alt="{{ member.name }}">
+          {% else %}
+            <span class="avatar-fallback">{{ member.name|slice:':1' }}</span>
+          {% endif %}
+        </a>
+        <p><a href="/team/{{ member.id }}/">{{ member.name }}</a></p>
+      </div>
+    {% empty %}
+      <div class="card muted">No members in this section.</div>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}
