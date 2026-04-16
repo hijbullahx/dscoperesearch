@@ -98,7 +98,7 @@ def publications_page(request):
 
 
 def team_page(request):
-    members = TeamMember.objects.order_by('name')
+    members = TeamMember.objects.order_by('role', 'position')
     core_members = [m for m in members if 'core' in (m.role or '').lower()]
     instructors = [
         m

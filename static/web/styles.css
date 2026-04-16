@@ -528,8 +528,9 @@ button.btn-danger {
 
 .member-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 220px));
   gap: 14px;
+  justify-content: center;
 }
 
 .member-list > .member {
