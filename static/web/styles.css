@@ -694,10 +694,33 @@ select:focus {
 @media (max-width: 760px) {
   .nav-inner {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .nav-links {
+    width: 100%;
     gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-links a,
+  .nav-links .btn {
+    flex: 0 0 auto;
+  }
+
+  .nav-links a {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .nav-links button.btn {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   .container {
