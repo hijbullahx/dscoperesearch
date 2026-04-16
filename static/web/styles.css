@@ -549,6 +549,56 @@ textarea {
   background: #f8fbff;
 }
 
+.profile-shell {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.profile-card {
+  padding: 24px;
+}
+
+.profile-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dbe6f4;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.profile-role {
+  margin: 6px 0 0;
+  color: #1f4d8f;
+  font-weight: 600;
+}
+
+.profile-bio {
+  margin: 16px 0 0;
+  color: #334155;
+  line-height: 1.72;
+}
+
+.chip-links {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip-links .btn-ghost {
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -592,5 +642,16 @@ textarea {
 
   .page-title {
     font-size: 28px;
+  }
+
+  .profile-card {
+    padding: 18px;
+  }
+
+  .profile-head {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 12px;
   }
 }
