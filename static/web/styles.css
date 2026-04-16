@@ -151,9 +151,9 @@ body::after {
 
 .signup-menu {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   right: 0;
-  width: min(240px, calc(100vw - 24px));
+  width: min(220px, calc(100vw - 24px));
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.98);
@@ -171,9 +171,9 @@ body::after {
 }
 
 .signup-menu-panel {
-  padding: 8px;
+  padding: 6px;
   border: 1px solid #d5e1f2;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
   backdrop-filter: blur(14px);
@@ -184,25 +184,17 @@ body::after {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 6px;
-}
-
-.signup-menu-label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #23477f;
+  margin-bottom: 4px;
 }
 
 .menu-close {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border: 1px solid #d1dbeb;
   border-radius: 999px;
   background: #f8fbff;
   color: #1f2f4a;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   box-shadow: none;
@@ -214,18 +206,21 @@ body::after {
 
 .signup-menu-item {
   display: block;
-  padding: 10px 10px;
-  border-radius: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
   text-decoration: none;
   color: #0f172a;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  transition: background-color 160ms ease, transform 160ms ease, color 160ms ease;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.signup-menu-item + .signup-menu-item {
+  border-top: 1px solid #edf2f7;
 }
 
 .signup-menu-item:hover {
-  background: #f5f9ff;
-  transform: translateX(2px);
+  background: #f6f9ff;
 }
 
 .signup-menu-admin {
@@ -885,7 +880,7 @@ select:focus {
   .signup-menu {
     right: auto;
     left: 0;
-    width: min(100vw - 24px, 240px);
+    width: min(100vw - 24px, 220px);
   }
 
   .container {
