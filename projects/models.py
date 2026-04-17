@@ -28,6 +28,14 @@ class TeamMember(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
   name = models.CharField(max_length=100)
   role = models.CharField(max_length=100)
+  assigned_instructor = models.ForeignKey(
+      'self',
+      on_delete=models.SET_NULL,
+      null=True,
+      blank=True,
+      related_name='assigned_students',
+      limit_choices_to={'role__icontains': 'Instructor'},
+  )
   position = models.PositiveIntegerField(default=999, help_text='Display order within role (lower number = first)')
   bio = models.TextField(blank=True)
   photo = models.ImageField(upload_to='team_photos/', blank=True, null=True)

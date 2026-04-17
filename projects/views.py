@@ -476,7 +476,57 @@ def admin_publications_manager_page(request):
 @login_required(login_url='admin-login-page')
 @user_passes_test(_is_staff, login_url='admin-login-page')
 def admin_team_members_manager_page(request):
-    return render(request, 'web/admin_team_members.html')
+    show_assign_modal = request.GET.get('assign') in {'1', 'true', 'yes'}
+
+    instructors = TeamMember.objects.filter(role__icontains='instructor').order_by('position', 'name')
+    assignable_members = TeamMember.objects.filter(role__icontains='student').order_by('position', 'name')
+    assignments = assignable_members.filter(assigned_instructor__isnull=False).order_by('name')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'assign-instructor':
+            member_id = request.POST.get('member_id')
+            instructor_id = request.POST.get('instructor_id')
+
+            member = TeamMember.objects.filter(id=member_id, role__icontains='student').first()
+            instructor = TeamMember.objects.filter(id=instructor_id, role__icontains='instructor').first()
+
+            if not member:
+                messages.error(request, 'Selected member is invalid.')
+                return redirect('/admin-panel/team-members/?assign=1')
+
+            if not instructor:
+                messages.error(request, 'Selected instructor is invalid.')
+                return redirect('/admin-panel/team-members/?assign=1')
+
+            member.assigned_instructor = instructor
+            member.save(update_fields=['assigned_instructor'])
+            messages.success(request, f'{member.name} is now assigned to {instructor.name}.')
+            return redirect('admin-team-members-manager-page')
+
+        if action == 'unassign-instructor':
+            member_id = request.POST.get('member_id')
+            member = TeamMember.objects.filter(id=member_id, role__icontains='student').first()
+            if not member:
+                messages.error(request, 'Selected member is invalid.')
+                return redirect('admin-team-members-manager-page')
+
+            member.assigned_instructor = None
+            member.save(update_fields=['assigned_instructor'])
+            messages.success(request, f'Assignment removed for {member.name}.')
+            return redirect('admin-team-members-manager-page')
+
+    return render(
+        request,
+        'web/admin_team_members.html',
+        {
+            'show_assign_modal': show_assign_modal,
+            'instructors': instructors,
+            'assignable_members': assignable_members,
+            'assignments': assignments,
+        },
+    )
 
 
 @login_required(login_url='admin-login-page')

@@ -1,6 +1,86 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<h1 class="page-title">Team Member Manager</h1>
-<div class="card muted">Team member management UI coming soon.</div>
+<section class="hero">
+	<span class="hero-kicker">Admin Control</span>
+	<h1 class="page-title">Team Member Manager</h1>
+	<p class="hero-subtitle">Assign registered members (students) to instructors.</p>
+</section>
+
+<section class="card admin-team-card">
+	<div class="admin-team-toolbar">
+		<a class="btn" href="?assign=1">Assign Member to Instructor</a>
+	</div>
+
+	<div class="admin-member-list">
+		{% for member in assignments %}
+			<div class="admin-member-row">
+				<div class="admin-member-main">
+					{% if member.photo %}
+						<img class="avatar-sm" src="{{ member.photo.url }}" alt="{{ member.name }}">
+					{% else %}
+						<span class="avatar-fallback-sm">{{ member.name|slice:':1' }}</span>
+					{% endif %}
+					<div class="admin-member-meta">
+						<span class="admin-member-name">{{ member.name }}</span>
+						<span class="admin-role-badge">{{ member.role }}</span>
+						<span class="muted">Assigned to: <strong>{{ member.assigned_instructor.name }}</strong></span>
+					</div>
+				</div>
+				<div class="admin-member-actions">
+					<form method="post" class="admin-inline-form">
+						{% csrf_token %}
+						<input type="hidden" name="action" value="unassign-instructor">
+						<input type="hidden" name="member_id" value="{{ member.id }}">
+						<button type="submit" class="admin-mini-btn admin-mini-btn-danger">Remove</button>
+					</form>
+				</div>
+			</div>
+		{% empty %}
+			<div class="card muted">No instructor assignments yet.</div>
+		{% endfor %}
+	</div>
+</section>
+
+{% if show_assign_modal %}
+	<div class="modal-backdrop"></div>
+	<div class="modal-shell">
+		<div class="card modal-card">
+			<div class="modal-head">
+				<h3>Assign Member to Instructor</h3>
+				<a href="/admin-panel/team-members/" class="admin-mini-btn">Close</a>
+			</div>
+
+			<form method="post" class="admin-team-form-grid">
+				{% csrf_token %}
+				<input type="hidden" name="action" value="assign-instructor">
+
+				<div class="form-row admin-team-wide">
+					<label for="member_id">Registered Member / Student</label>
+					<select id="member_id" name="member_id" required>
+						<option value="">Select member</option>
+						{% for member in assignable_members %}
+							<option value="{{ member.id }}">{{ member.name }}{% if member.assigned_instructor %} (currently: {{ member.assigned_instructor.name }}){% endif %}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<div class="form-row admin-team-wide">
+					<label for="instructor_id">Instructor</label>
+					<select id="instructor_id" name="instructor_id" required>
+						<option value="">Select instructor</option>
+						{% for instructor in instructors %}
+							<option value="{{ instructor.id }}">{{ instructor.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<div class="admin-team-actions">
+					<button class="btn" type="submit">Assign</button>
+					<a class="btn btn-ghost" href="/admin-panel/team-members/">Cancel</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endif %}
 {% endblock %}
