@@ -1,0 +1,27 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<section class="hero">
+  <span class="hero-kicker">Verification</span>
+  <h1 class="page-title">Verify Certificate</h1>
+  <p class="hero-subtitle">Enter your credential number to verify certificate details.</p>
+</section>
+
+<section class="section-panel" style="max-width: 680px; margin: 0 auto;">
+  <article class="card auth-card" style="margin: 0;">
+    <form method="get" action="" autocomplete="off">
+      <div class="form-row" style="margin-bottom: 14px;">
+        <label for="credential_number">Credential Number</label>
+        <input
+          id="credential_number"
+          name="credential_number"
+          type="text"
+          placeholder="Enter credential number"
+          value="{{ request.GET.credential_number|default:'' }}"
+        >
+      </div>
+      <button type="submit" class="btn">Verify</button>
+    </form>
+  </article>
+</section>
+{% endblock %}

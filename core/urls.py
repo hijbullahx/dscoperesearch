@@ -11,6 +11,7 @@ urlpatterns = [
     path('projects/', project_views.projects_page, name='projects-page'),
     path('publications/', project_views.publications_page, name='publications-page'),
     path('team/', project_views.team_page, name='team-page'),
+    path('verify-certificate/', project_views.verify_certificate_page, name='verify-certificate-page'),
     path('team/<int:member_id>/', project_views.team_member_detail_page, name='team-member-detail-page'),
     path('login/registered-member/', project_views.registered_member_login_page, name='registered-member-login-page'),
     path('login/instructor/', project_views.instructor_login_page, name='instructor-login-page'),

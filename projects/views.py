@@ -176,6 +176,10 @@ def team_member_detail_page(request, member_id):
     return render(request, 'web/team_detail.html', {'member': member})
 
 
+def verify_certificate_page(request):
+    return render(request, 'web/verify_certificate.html')
+
+
 def admin_login_page(request):
     if request.user.is_authenticated and request.user.is_staff:
         return redirect('admin-dashboard-page')

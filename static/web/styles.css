@@ -82,9 +82,36 @@ body::after {
 }
 
 .brand {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #0f172a;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(236, 245, 255, 0.92));
+  border: 1px solid rgba(176, 198, 230, 0.9);
+  line-height: 1;
+  padding: 11px 18px;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-width: 0;
+  font-size: clamp(1.12rem, 1.8vw, 1.5rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.brand:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(229, 240, 255, 0.98));
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+  border-color: rgba(37, 99, 235, 0.22);
+}
+
+.brand:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
 }
 
 .nav-links {
@@ -527,8 +554,8 @@ button.btn-danger {
 }
 
 .member-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 220px));
+  display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   justify-content: center;
 }
@@ -550,6 +577,7 @@ button.btn-danger {
 }
 
 .member {
+  width: 220px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -570,11 +598,13 @@ button.btn-danger {
 }
 
 .member-name-open {
+  display: inline-block;
   font-weight: 600;
   color: #123a76;
 }
 
-.member-name-open:hover {
+.member-name-open:hover,
+.member-name-open:focus-visible {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -592,6 +622,11 @@ button.btn-danger {
   display: block;
   margin: 0 auto;
   border: 1px solid var(--line);
+}
+
+.member-avatar-wrap {
+  display: flex;
+  justify-content: center;
 }
 
 .avatar {
